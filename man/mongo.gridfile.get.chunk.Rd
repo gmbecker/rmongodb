@@ -24,6 +24,7 @@ See \url{http://www.mongodb.org/display/DOCS/GridFS+Specification}.
 mongo <- mongo.create()
 if (mongo.is.connected(mongo)) {
     gridfs <- mongo.gridfs.create(mongo, "grid")
+    mongo.gridfs.store.file(gridfs, "tests/test.R")
 
     gf <- mongo.gridfs.find(gridfs, "test.R")
     chunk <- mongo.gridfile.get.chunk(gf, 0)

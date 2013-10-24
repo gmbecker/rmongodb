@@ -24,8 +24,9 @@ documents contains the actual data belonging to the chunk.  See \url{http://www.
 mongo <- mongo.create()
 if (mongo.is.connected(mongo)) {
     gridfs <- mongo.gridfs.create(mongo, "grid")
+    mongo.gridfs.store.file(gridfs, "tests/test.R", "test.R")
 
-    gf <- mongo.gridfs.find(gridfs, "rmongodb.pdf")
+    gf <- mongo.gridfs.find(gridfs, "test.R")
     cursor <- mongo.gridfile.get.chunks(gf, 1, 2)
 
     f <- file("rmongodb.pdf.chunks12", "wb")
