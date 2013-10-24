@@ -1,7 +1,7 @@
 rmongodb
 ===================
 
-This is an R extension supporting access to MongoDB using the mongodb-c-driver.
+This is an R (www.r-project.org) extension supporting access to MongoDB (www.mongodb.org) using the mongodb-c-driver.
 
 Thanks to Gerald Lindsly and MongoDB, Inc. (formerly 10gen) for all the initial work. 
 In October 2013, **MongoSoup** (www.mongosoup.de) has overtacken the development and maintenance of the R package. 
@@ -11,7 +11,7 @@ requests: markus@mongosoup.de
 
 Usage
 ==================
-Once you have installed the package, it may be loaded from within R like any other:
+Once you have installed the package, it may be loaded from within R like any other package:
 
     library("rmongodb")
     
