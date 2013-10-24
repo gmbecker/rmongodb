@@ -1,24 +1,51 @@
-This is an R extension supporting access to MongoDB.
+rmongodb
+===================
 
-After cloning the repo, 
-drop [mongo-c-driver](http://github.com/mongodb/mongo-c-driver)'s src directory 
-into rmongodb/rmongodb/src.  Alternately, unpack mongo-c-driver-src.zip into rmongodb/rmongodb/src.
+This is an R extension supporting access to MongoDB using the mongodb-c-driver.
 
-The driver is installed into R with:
+Thanks to Gerald Lindsly and MongoDB, Inc. (formerly 10gen) for all the initial work. 
+In October 2013, **MongoSoup** (www.mongosoup.de) has overtacken the development and maintenance of the R package. 
 
-`R CMD INSTALL rmongodb`
+Please feel free to send us issues, feedback or push 
+requests: markus@mongosoup.de
 
-If you have compile problems, this may be due to interface changes to mongo-c-driver.  
-In rmongodb/ is an archived copy of mongo-c-driver (mongo-c-driver-src.zip)
-that you can unpack to .../src .  Since this is the version of the mongo-c-driver
-used in the development of rmongodb, you may have better results.
-
+Usage
+==================
 Once you have installed the package, it may be loaded from within R like any other:
 
-`>library("rmongodb") # for instance`
+    library("rmongodb")
+    
+    mongo <- mongo.create()
+    
+    buf <- mongo.bson.buffer.create()
+    mongo.bson.buffer.append(buf, "age", 18L)
+    query <- mongo.bson.from.buffer(buf)
+
+    # Find the first 100 records
+    #    in collection people of database test where age == 18
+    cursor <- mongo.find(mongo, "test.people", query, limit=100L)
+    # Step though the matching records and display them
+    while (mongo.cursor.next(cursor))
+        print(mongo.cursor.value(cursor))
+    mongo.cursor.destroy(cursor)
 
 To run the unit tests:
+    R --no-save < tests/test.R
 
-`R --no-save < test.R`
+
+Development
+==================
+
+To install the development version of rmongodb, it's easiest to use the devtools package:
+
+    # install.packages("devtools")
+    library(devtools)
+    install_github("rmongodb", "mongosoup")
+
+
+
+
+
+
 
 
