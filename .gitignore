@@ -27,3 +27,4 @@ rmongodb/src/env.c
 rmongodb/src/numbers.c
 .Rproj.user
 .Rhistory
+.DS_Store
