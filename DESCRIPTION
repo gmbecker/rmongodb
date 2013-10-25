@@ -7,4 +7,6 @@ Author: Gerald Lindsly & MongoDB, Inc. (mongo-c-driver) & Markus Schmidberger (m
 Maintainer: Markus Schmidberger <markus@mongosoup.de>
 Description: This R package provides an interface to the NoSQL MongoDB database using the mongoDB C-driver.
 License: Apache License 2.0
-LazyLoad: yes
+URL: https://github.com/mongosoup/rmongodb
+BugReports: https://github.com/mongosoup/rmongodb/issues 
+SystemRequirements: MongoDB
