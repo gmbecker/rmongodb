@@ -333,21 +333,15 @@ b <- mongo.bson.from.buffer(buf)
 print(b)
 print(mongo.bson.to.list(b))
 
+
+
 gfs <- mongo.gridfs.create(mongo, "grid")
-if (!mongo.gridfs.store.file(gfs, "test.R"))
+if (!mongo.gridfs.store.file(gfs, "test.R", "test.R"))
     stop("unable to store test.R")
-if (!mongo.gridfs.store.file(gfs, "rmongodb.pdf"))
-    stop("unable to store rmongodb.pdf")
-if (!mongo.gridfs.store.file(gfs, "check.bat"))
-    stop("unable to store check.bat")
-if (!mongo.gridfs.store.file(gfs, "test.bat"))
-    stop("unable to store test.bat")
 
-mongo.gridfs.remove.file(gfs, "test.bat")
-if (!is.null(mongo.gridfs.find(gfs, "test.bat")))
-    stop("mongo.gridfs.remove.file didn't work.")
 
-gridfile <- mongo.gridfs.find(gfs, "check.bat")
+
+gridfile <- mongo.gridfs.find(gfs, "test.R")
 print(mongo.gridfile.get.descriptor(gridfile))
 print(mongo.gridfile.get.filename(gridfile))
 print(mongo.gridfile.get.length(gridfile))
@@ -380,6 +374,10 @@ mongo.gridfile.pipe(gridfile, test.out)
     mongo.gridfile.writer.write(gfw, buf)
 
     mongo.gridfile.writer.finish(gfw)
+
+mongo.gridfs.remove.file(gfs, "test.R")
+if (!is.null(mongo.gridfs.find(gfs, "test.R")))
+  stop("mongo.gridfs.remove.file didn't work.")
 
 mongo.gridfile.destroy(gridfile)
 
