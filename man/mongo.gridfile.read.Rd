@@ -28,8 +28,9 @@ Check \code{\link{mongo.get.err}()} of the associated mongo connection object in
 mongo <- mongo.create()
 if (mongo.is.connected(mongo)) {
     gridfs <- mongo.gridfs.create(mongo, "grid")
+    mongo.gridfs.store.file(gridfs, "tests/test.R", "test.R")
 
-    gf <- mongo.gridfs.find(gridfs, "rmongodb.pdf")
+    gf <- mongo.gridfs.find(gridfs, "test.R")
     mongo.gridfile.seek(gf, 256*256*5)
     data <- mongo.gridfile.read(gf, 16384)
 
