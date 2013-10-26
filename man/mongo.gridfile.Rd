@@ -20,10 +20,10 @@ if (mongo.is.connected(mongo)) {
     mongo.gridfs.store.file(gridfs, "tests/test.R", "test.R")
 
     gf <- mongo.gridfs.find(gridfs, "test.R")
-    test.R <- file("test2.R")
-    mongo.gridfile.pipe(gf, test.R)
-
-    mongo.gridfile.destroy(gf)
+    if( !is.null(gf)){
+        gf
+        mongo.gridfile.destroy(gf)
+    }
     mongo.gridfs.destroy(gridfs)
 }
 }
