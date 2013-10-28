@@ -10,3 +10,4 @@ License: Apache License 2.0
 URL: https://github.com/mongosoup/rmongodb
 BugReports: https://github.com/mongosoup/rmongodb/issues 
 SystemRequirements: MongoDB
+Suggests: RUnit

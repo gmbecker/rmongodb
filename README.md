@@ -3,6 +3,8 @@ rmongodb
 
 This is an R (www.r-project.org) extension supporting access to MongoDB (www.mongodb.org) using the mongodb-c-driver.
 
+The latest stable version will be soon available on **CRAN**: http://cran.r-project.org/package=rmongodb
+
 Thanks to Gerald Lindsly and MongoDB, Inc. (formerly 10gen) for all the initial work. 
 In October 2013, **MongoSoup** (www.mongosoup.de) has overtaken the development and maintenance of the R package. 
 
