@@ -22,9 +22,11 @@ if (mongo.is.connected(mongo)) {
     mongo.gridfs.store.file(gridfs, "tests/test.R", "test.R")
 
     gf <- mongo.gridfs.find(gridfs, "test.R")
-    print(mongo.gridfile.get.chunk.count(gf))
+    if( !is.null(gf)){
+      print(mongo.gridfile.get.chunk.count(gf))
 
-    mongo.gridfile.destroy(gf)
+      mongo.gridfile.destroy(gf)
+    }
     mongo.gridfs.destroy(gridfs)
 }
 }

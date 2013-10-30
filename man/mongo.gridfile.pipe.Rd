@@ -27,9 +27,10 @@ if (mongo.is.connected(mongo)) {
     if (!is.null(gf)) {
         f <- file("mongodb_copy.pdf")
         mongo.gridfile.pipe(gf, f)
+        
+        mongo.gridfile.destroy(gf)
     }
 
-    mongo.gridfile.destroy(gf)
     mongo.gridfs.destroy(gridfs)
 }
 }

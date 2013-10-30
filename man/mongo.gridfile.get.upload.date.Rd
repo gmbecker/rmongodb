@@ -21,10 +21,11 @@ if (mongo.is.connected(mongo)) {
     mongo.gridfs.store.file(gridfs, "tests/test.R", "test.R")
 
     gf <- mongo.gridfs.find(gridfs, "test.R")
-    if( !is.null(gf))
+    if( !is.null(gf) ){
       print(mongo.gridfile.get.upload.date(gf))
 
-    mongo.gridfile.destroy(gf)
+      mongo.gridfile.destroy(gf)
+    }
     mongo.gridfs.destroy(gridfs)
 }
 }

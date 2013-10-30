@@ -31,10 +31,12 @@ if (mongo.is.connected(mongo)) {
     mongo.gridfs.store.file(gridfs, "tests/test.R", "test.R")
 
     gf <- mongo.gridfs.find(gridfs, "test.R")
-    mongo.gridfile.seek(gf, 256*256*5)
-    data <- mongo.gridfile.read(gf, 16384)
+    if( !is.null(gf)){
+      mongo.gridfile.seek(gf, 256*256*5)
+      data <- mongo.gridfile.read(gf, 16384)
 
-    mongo.gridfile.destroy(gf)
+      mongo.gridfile.destroy(gf)
+    }
     mongo.gridfs.destroy(gridfs)
 }
 }

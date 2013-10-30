@@ -27,18 +27,20 @@ if (mongo.is.connected(mongo)) {
     mongo.gridfs.store.file(gridfs, "tests/test.R", "test.R")
 
     gf <- mongo.gridfs.find(gridfs, "test.R")
-    cursor <- mongo.gridfile.get.chunks(gf, 1, 2)
-
-    f <- file("rmongodb.pdf.chunks12", "wb")
-    while (mongo.cursor.next(cursor)) {
-        chunk <- mongo.cursor.value(cursor)
-        iter <- mongo.bson.find(chunk, "data")
-
-        # write the binary (raw) data to the file
-        writeBin(mongo.bson.iterator.value(iter), f)
+    if( !is.null(gf)){
+      cursor <- mongo.gridfile.get.chunks(gf, 1, 2)
+  
+      f <- file("rmongodb.pdf.chunks12", "wb")
+      while (mongo.cursor.next(cursor)) {
+          chunk <- mongo.cursor.value(cursor)
+          iter <- mongo.bson.find(chunk, "data")
+  
+          # write the binary (raw) data to the file
+          writeBin(mongo.bson.iterator.value(iter), f)
+      }
+      close(f)
+      mongo.gridfile.destroy(gf)
     }
-    close(f)
-    mongo.gridfile.destroy(gf)
     mongo.gridfs.destroy(gridfs)
 }
 }
