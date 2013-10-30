@@ -65,3 +65,72 @@ v
 unclass(v)
 
 #checkEquals(v, village)
+
+
+m <- matrix(c(1,0,0, 0,1,0, 0,0,1), nrow=3, ncol=3, dimnames=list(c("X","Y","Z"),c("x","y","z")))
+m
+buf <- mongo.bson.buffer.create()
+mongo.bson.buffer.append.object(buf, "mat", m)
+b <- mongo.bson.from.buffer(buf)
+print(b)
+v <- mongo.bson.value(b, "mat")
+v
+attributes(v)
+
+buf <- mongo.bson.buffer.create()
+mongo.bson.buffer.append(buf, "x", 5L)
+scope <- mongo.bson.from.buffer(buf)
+codew <- mongo.code.w.scope.create("y = x", scope)
+print(codew)
+
+buf <- mongo.bson.buffer.create()
+mongo.bson.buffer.append.string(buf, "name", "Gerald")
+mongo.bson.buffer.append.int(buf, "age", 48L)
+mongo.bson.buffer.append.bool(buf, "True", TRUE)
+mongo.bson.buffer.append.double(buf, "ThreePointFive", 3.5)
+mongo.bson.buffer.append.long(buf, "YearSeconds", 365.24219 * 24 * 60 * 60)
+mongo.bson.buffer.append.time(buf, "lt", strptime("05-12-2012", "%m-%d-%Y"))
+
+oid <- mongo.oid.from.string("1234567890AB1234567890AB")
+mongo.bson.buffer.append.oid(buf, "_id", oid)
+id <- mongo.oid.create()
+print(mongo.oid.time(id))
+print(as.character(id))
+mongo.bson.buffer.append(buf, "ID", id)
+mongo.bson.buffer.append.null(buf, "Null")
+
+mongo.bson.buffer.start.object(buf, "One_Four")
+for (x in 1:4)
+  mongo.bson.buffer.append.int(buf, as.character(x), x)
+mongo.bson.buffer.finish.object(buf)
+
+code <- mongo.code.create("CoDe")
+mongo.bson.buffer.append(buf, "code", code)
+
+mongo.bson.buffer.append(buf, "CodeW", codew)
+
+mongo.bson.buffer.append.symbol(buf, "symbol", "SyMbOl")
+
+mongo.bson.buffer.append.undefined(buf, "undefined1")
+undef <- mongo.undefined.create()
+mongo.bson.buffer.append(buf, "undefined2", undef)
+
+mongo.bson.buffer.append(buf, "regex",
+                         mongo.regex.create("pattern", "options"))
+
+bin <- raw(length=3)
+for (i in 0:2)
+  bin[i] = as.raw(i * 3)
+mongo.bson.buffer.append(buf, "bin", bin)
+
+mongo.bson.buffer.append.time(buf, "Now", Sys.time())
+ts <- mongo.timestamp.create(Sys.time() + 24 * 60 * 60, 25L)
+mongo.bson.buffer.append.timestamp(buf, "Later", ts)
+
+mongo.bson.buffer.start.object(buf, "data")
+mongo.bson.buffer.append(buf, "sub1", 1L)
+mongo.bson.buffer.append(buf, "sub2", Sys.time())
+mongo.bson.buffer.finish.object(buf)
+
+b <- mongo.bson.from.buffer(buf)
+print(b)
