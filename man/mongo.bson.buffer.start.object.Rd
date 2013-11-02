@@ -1,12 +1,15 @@
-\name{mongo.bson.buffer.finish.object}
-\alias{mongo.bson.buffer.finish.object}
-\title{Finish a subobject or array within a mongo.bson.buffer}
+\name{mongo.bson.buffer.start.object}
+\alias{mongo.bson.buffer.start.object}
+\title{Start a subobject within a mongo.bson.buffer}
 \usage{
-  mongo.bson.buffer.finish.object(buf)
+  mongo.bson.buffer.start.object(buf, name)
 }
 \arguments{
   \item{buf}{(\link{mongo.bson.buffer}) The buffer object
-  on which to finish a subobject.}
+  to which to append.}
+
+  \item{name}{(string) The name (key) of the subobject to
+  be appended to the buffer.}
 }
 \value{
   TRUE if successful; otherwise, FALSE if an error occured
@@ -14,15 +17,17 @@
 }
 \description{
   BSON documents may themselves contain nested documents.
-  Call this function to finish a subobject within a
+  Call this function to start a subobject within a
   \link{mongo.bson.buffer}.
 }
 \details{
-  \code{\link{mongo.bson.buffer.start.object}()} and
+  \code{\link{mongo.bson.buffer.finish.object}()} must be
+  called when finsihed appending subfields.\cr
+  (\code{mongo.bson.buffer.start.object()},
+  \code{mongo.bson.buffer.start.array()})\cr and
   \code{mongo.bson.buffer.finish.object()} may be called in
-  a stackwise (LIFO) order to further nest documents.
-
-  This function must also be called to finish arrays.
+  a stackwise (LIFO) order to further nest documents and
+  arrays.
 }
 \examples{
 buf <- mongo.bson.buffer.create()
@@ -38,7 +43,7 @@ b <- mongo.bson.from.buffer(buf)
 }
 \seealso{
   \link{mongo.bson},\cr \link{mongo.bson.buffer},\cr
-  \code{\link{mongo.bson.buffer.start.object}},\cr
+  \code{\link{mongo.bson.buffer.finish.object}},\cr
   \code{\link{mongo.bson.buffer.start.array}},\cr
   \code{\link{mongo.bson.buffer.append}}.
 }
