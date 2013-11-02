@@ -1,6 +1,6 @@
 \name{mongo.distinct}
 \alias{mongo.distinct}
-\title{Get a vector of distinct keys in a collection}
+\title{Get a vector of distinct values for keys in a collection}
 \usage{
   mongo.distinct(mongo, ns, key,
     query = mongo.bson.empty())
@@ -25,7 +25,7 @@
   (vector) The result set of distinct keys.
 }
 \description{
-  Get a vector of distinct keys in a collection.
+  Get a vector of distinct values for keys in a collection.
 }
 \details{
   See
