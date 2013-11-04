@@ -134,3 +134,19 @@ mongo.bson.buffer.finish.object(buf)
 
 b <- mongo.bson.from.buffer(buf)
 print(b)
+
+
+#buf <- mongo.bson.buffer.create()
+#mongo.bson.buffer.append(buf, "name", "Fred")
+#mongo.bson.buffer.append(buf, "city", "Dayton")
+#mongo.bson.buffer.append(buf, "age", 21L)
+#print(mongo.bson.buffer.size(buf))
+
+#y <- mongo.bson.from.buffer(buf)
+#print(mongo.bson.size(y))
+
+#l <- mongo.bson.to.list(y)
+#print(l$name)
+#print(l$city)
+#l$city <- "Detroit"
+#print(l)

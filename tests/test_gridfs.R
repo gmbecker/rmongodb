@@ -1,12 +1,18 @@
 library(rmongodb)
 library(RUnit)
 
+# empty test db
+mongo <- mongo.create()
+db <- "rmongodb"
+ns <- paste(db, "test_gridfs", sep=".")
+mongo.drop(mongo, ns)
 
-gfs <- mongo.gridfs.create(mongo, "grid")
-if (!mongo.gridfs.store.file(gfs, "test.R", "test.R"))
+gfs <- mongo.gridfs.create(mongo, ns)
+if (!mongo.gridfs.store.file(gfs, "tests//test_bson.R", "test.R"))
   stop("unable to store test.R")
 
 
+# TODO
 
 gridfile <- mongo.gridfs.find(gfs, "test.R")
 print(mongo.gridfile.get.descriptor(gridfile))
