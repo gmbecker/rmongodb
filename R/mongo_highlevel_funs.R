@@ -30,6 +30,8 @@
 #'     print(keys)
 #' }
 #' 
+#' @aliases mongo.get.values
+#' @export mongo.get.values
 #' @export mongo.distinct
 mongo.distinct <- function(mongo, ns, key, query=mongo.bson.empty()) {
   pos <- regexpr('\\.', ns)
@@ -44,7 +46,7 @@ mongo.distinct <- function(mongo, ns, key, query=mongo.bson.empty()) {
     b <- mongo.bson.value(b, "values")
   b
 }
-
+mongo.get.values <- mongo.distinct
 
 
 
