@@ -1,10 +1,12 @@
 \name{mongo.find.all}
 \alias{mongo.find.all}
+\alias{mongo.find.batch}
 \title{Find records in a collection and returns one R data frame object}
 \usage{
   mongo.find.all(mongo, ns, query = mongo.bson.empty(),
     sort = mongo.bson.empty(), fields = mongo.bson.empty(),
-    limit = 0L, skip = 0L, options = 0L)
+    limit = 0L, skip = 0L, options = 0L,
+    data.frame = FALSE, ...)
 }
 \arguments{
   \item{mongo}{(\link{mongo}) a mongo connection object.}
@@ -58,6 +60,13 @@
   \item\link{mongo.find.await.data}
   \item\link{mongo.find.exhaust}
   \item\link{mongo.find.partial.results} }}
+
+  \item{data.frame}{(boolean) If TRUE the result will be an
+  \link{data.frame} object, if FALSE it will be an
+  \link{list} object. Due to NoSQL in mongodb in most cases
+  a data.frame object will not work!}
+
+  \item{...}{optional arguments to \link{as.data.frame}}
 }
 \value{
   An R data frame object.
