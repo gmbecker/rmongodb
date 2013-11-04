@@ -1,6 +1,16 @@
 rmongodb NEWS
 ========================================================
 
+November 4, 2013
+* introduction of first mongo high level functionality
+** mongo.get.keys - to get all keys from a collection
+** mongo.summary - to get summary statistics all keys in a collection
+* JSON 2 BSON implemented
+** mongo.bson.from.JSON 
+* code to deal with cursors
+** mongo.cursor.to.list
+** mongo.cursor.to.data.frame
+
 November 2, 2013
 * use roxygen for documentation
 * implementing first high level functions
