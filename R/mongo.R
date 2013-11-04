@@ -1187,12 +1187,18 @@ mongo.find <- function(mongo, ns, query=mongo.bson.empty(), sort=mongo.bson.empt
 #' \item\link{mongo.find.slave.ok} \item\link{mongo.find.oplog.replay}
 #' \item\link{mongo.find.no.cursor.timeout} \item\link{mongo.find.await.data}
 #' \item\link{mongo.find.exhaust} \item\link{mongo.find.partial.results} }
+#' @param data.frame (boolean) If TRUE the result will be an \link{data.frame} 
+#' object, if FALSE it will be an \link{list} object. Due to NoSQL in 
+#' mongodb in most cases a data.frame object will not work!
+#' @param ...  optional arguments to \link{as.data.frame}
+#' 
 #' @return An R data frame object.
+#' 
 #' @seealso \code{\link{mongo.find.one}},\cr \code{\link{mongo.insert}},\cr
 #' \code{\link{mongo.index.create}},\cr \code{\link{mongo.update}},\cr
 #' \code{\link{mongo.remove}},\cr \link{mongo}.
-#' @examples
 #' 
+#' @examples
 #' mongo <- mongo.create()
 #' if (mongo.is.connected(mongo)) {
 #'     buf <- mongo.bson.buffer.create()
@@ -1210,18 +1216,134 @@ mongo.find <- function(mongo, ns, query=mongo.bson.empty(), sort=mongo.bson.empt
 #'                          list(name=1L), list(name=1L, address=1L))
 #' }
 #' 
+#' @aliases mongo.find.batch
+#' 
+#' @export mongo.find.batch
 #' @export mongo.find.all
-mongo.find.all <- function(mongo, ns, query=mongo.bson.empty(), sort=mongo.bson.empty(), fields=mongo.bson.empty(), limit=0L, skip=0L, options=0L) {
+mongo.find.all <- function(mongo, ns, 
+                           query=mongo.bson.empty(), sort=mongo.bson.empty(), 
+                           fields=mongo.bson.empty(), limit=0L, skip=0L,
+                           options=0L,
+                           data.frame=FALSE, ...) {
+  
   cursor <- mongo.find(mongo, ns, query=query, sort=sort, fields=fields, limit=limit, skip=skip, options=options)
-  res <- NULL
+  
+  if( data.frame == TRUE ){
+    res <- mongo.cursor.to.data.frame(cursor, ...)
+  } else
+    res <- mongo.cursor.to.list(cursor)
+  
+  return(res)
+  
+}
+mongo.find.batch <- mongo.find.all
+
+
+#' Convert Mongo Cursor Object to List 
+#' 
+#' Converts a mongo cursor object to a list by interating over all cursor objects and combining them.
+#' 
+#' @param cursor (\link{mongo.cursor}) A mongo.cursor object returned from
+#' \code{\link{mongo.find}()}.
+#' @param nullToNA (boolean) If \code{NULL} values will be torned into \code{NA} values. 
+#' Usually this is a good idea, because sporadic \code{NULL} values will cause structural 
+#' problems in the data.frame, whereas \code{NA} values will just appear as regular \code{NA}s.
+
+#' @return An R list object.
+#' 
+#' @seealso \code{\link{mongo.find}},\cr \code{\link{mongo.bson.to.list}}.
+#' 
+#' @examples
+#' mongo <- mongo.create()
+#' if (mongo.is.connected(mongo)) {
+#'     buf <- mongo.bson.buffer.create()
+#'     mongo.bson.buffer.append(buf, "age", 22L)
+#'     query <- mongo.bson.from.buffer(buf)
+#' 
+#'     # Find the first 100 records
+#'     #    in collection people of database test where age == 22
+#'     cursor <- mongo.find(mongo, "test.people", query, limit=100L)
+#' 
+#'     res <- mongo.cursor.to.list(cursor)
+#' 
+#' }
+#' 
+#' @export mongo.cursor.to.list
+mongo.cursor.to.list <- function(cursor, nullToNA = TRUE){
+  
+  res <- list()
+
   while ( mongo.cursor.next(cursor) ){
-    res <- rbind(res, mongo.bson.to.list(mongo.cursor.value(cursor)))
+    val <- mongo.bson.to.list(mongo.cursor.value(cursor))
+    
+    if( nullToNA == TRUE )
+      val[sapply(val, is.null)] <- NA
+    
+    res <- rbind(res, val)
+
   }
+  
+  return(res)
+}
+  
+  
+
+#' Convert Mongo Cursor Object to Data.Frame 
+#' 
+#' Converts a mongo cursor object to a data.frame by interating over all cursor objects and combining them.
+#' 
+#' Note that mongo.oid columns will be removed. data.frame can not deal with them.
+#' 
+#' @param cursor (\link{mongo.cursor}) A mongo.cursor object returned from
+#' \code{\link{mongo.find}()}.
+#' @param ... Additional parameters parsed to the function \code{\link{as.data.frame}}
+#' @param nullToNA (boolean) If \code{NULL} values will be torned into \code{NA} values. 
+#' Usually this is a good idea, because sporadic \code{NULL} values will cause structural 
+#' problems in the data.frame, whereas \code{NA} values will just appear as regular \code{NA}s.
+#' 
+#' @return An R data.frame object.
+#' 
+#' @seealso \code{\link{mongo.find}},\cr \code{\link{as.data.frame}}.
+#' 
+#' @examples
+#' mongo <- mongo.create()
+#' if (mongo.is.connected(mongo)) {
+#'     buf <- mongo.bson.buffer.create()
+#'     mongo.bson.buffer.append(buf, "age", 22L)
+#'     query <- mongo.bson.from.buffer(buf)
+#' 
+#'     # Find the first 100 records
+#'     #    in collection people of database test where age == 22
+#'     cursor <- mongo.find(mongo, "test.people", query, limit=100L)
+#' 
+#'    res <- mongo.cursor.to.data.frame(cursor)
+#' 
+#' }
+#' 
+#' @export mongo.cursor.to.data.frame
+mongo.cursor.to.data.frame <- function(cursor, nullToNA=TRUE, ...){
+  
+  res <- data.frame()
+  
+  while ( mongo.cursor.next(cursor) ){
+    val <- mongo.bson.to.list(mongo.cursor.value(cursor))
+    
+    if( nullToNA == TRUE )
+      val[sapply(val, is.null)] <- NA
+    
+    # remove mongo.oid -> data.frame can not deal with that!
+    val <- val[sapply(val, class) != 'mongo.oid']
+    
+    res <- rbind(res, as.data.frame(val, ... ))
+    
+  }
+  
   return(res)
 }
 
 
-
+  
+  
 #' Advance a cursor to the next record
 #' 
 #' \code{\link{mongo.cursor.next}(cursor)} is used to step to the first or next
@@ -1750,5 +1872,3 @@ mongo.get.databases <- function(mongo)
 #' @export mongo.get.database.collections
 mongo.get.database.collections <- function(mongo, db)
     .Call(".mongo.get.database.collections", mongo, db)
-
-
