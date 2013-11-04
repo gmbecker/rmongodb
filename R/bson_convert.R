@@ -22,7 +22,12 @@ mongo.bson.from.JSON <- function(JSON, ...){
   
   #isValidJSON(JSON)
   
-  bson <- mongo.bson.from.list( as.list( fromJSON(JSON, ...) ) )
+  json_list <- fromJSON(JSON, ...)
+  
+  if( length(json_list) == 0 ){
+    bson <- mongo.bson.empty()
+  } else
+    bson <- mongo.bson.from.list( as.list( json_list  ) )
   
   return(bson)
 }
