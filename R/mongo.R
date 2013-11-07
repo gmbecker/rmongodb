@@ -1323,22 +1323,22 @@ mongo.cursor.to.list <- function(cursor, nullToNA = TRUE){
 #' @export mongo.cursor.to.data.frame
 mongo.cursor.to.data.frame <- function(cursor, nullToNA=TRUE, ...){
   
-  res <- data.frame()
-  
+  env <- new.env(parent=emptyenv(), hash=TRUE)
   while ( mongo.cursor.next(cursor) ){
     val <- mongo.bson.to.list(mongo.cursor.value(cursor))
     
     if( nullToNA == TRUE )
       val[sapply(val, is.null)] <- NA
     
+
+    id <- as.character(val[["_id"]])
     # remove mongo.oid -> data.frame can not deal with that!
     val <- val[sapply(val, class) != 'mongo.oid']
     
-    res <- rbind(res, as.data.frame(val, ... ))
-    
+    assign(id, val, envir=env)
+
   }
-  
-  return(res)
+  as.data.frame(as.list(env), ...)
 }
 
 
