@@ -1271,6 +1271,7 @@ mongo.find.batch <- mongo.find.all
 #' @export mongo.cursor.to.list
 mongo.cursor.to.list <- function(cursor, nullToNA = TRUE){
   
+  warning("This fails for most NoSQL data structures. I am working on a new solution")
   res <- list()
 
   while ( mongo.cursor.next(cursor) ){
@@ -1323,15 +1324,20 @@ mongo.cursor.to.list <- function(cursor, nullToNA = TRUE){
 #' @export mongo.cursor.to.data.frame
 mongo.cursor.to.data.frame <- function(cursor, nullToNA=TRUE, ...){
   
+  warning("This fails for most NoSQL data structures. I am working on a new solution")
+  
   env <- new.env(parent=emptyenv(), hash=TRUE)
   while ( mongo.cursor.next(cursor) ){
     val <- mongo.bson.to.list(mongo.cursor.value(cursor))
+    
+    print(val)
     
     if( nullToNA == TRUE )
       val[sapply(val, is.null)] <- NA
     
 
     id <- as.character(val[["_id"]])
+    print(id)
     # remove mongo.oid -> data.frame can not deal with that!
     val <- val[sapply(val, class) != 'mongo.oid']
     
