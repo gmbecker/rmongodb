@@ -18,8 +18,6 @@
 #' @export mongo.bson.from.JSON
 mongo.bson.from.JSON <- function(JSON, ...){
   
-  require(rjson)
-  
   #isValidJSON(JSON)
   
   json_list <- fromJSON(JSON, ...)

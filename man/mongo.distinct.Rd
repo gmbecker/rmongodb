@@ -1,5 +1,6 @@
 \name{mongo.distinct}
 \alias{mongo.distinct}
+\alias{mongo.get.values}
 \title{Get a vector of distinct values for keys in a collection}
 \usage{
   mongo.distinct(mongo, ns, key,

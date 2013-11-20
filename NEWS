@@ -1,6 +1,9 @@
 rmongodb NEWS
 ========================================================
 
+November 20, 2013
+* bugfix for boolean BSON values (github Issue #18)
+
 November 4, 2013
 * introduction of first mongo high level functionality
 ** mongo.get.keys - to get all keys from a collection

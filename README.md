@@ -100,6 +100,9 @@ To run the unit tests:
     
 We advice using RStudio (www.rstudio.org) for the package development. The RStudio .Rproj file is included in the repository.
 
+### Usefull links
+* BSON specification: http://bsonspec.org/#/specification
+
 ### Versioning
 We use a three step version number system, e.g. v1.2.1:
 * first: major changes as new C libraries
