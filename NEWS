@@ -1,6 +1,9 @@
 rmongodb NEWS
 ========================================================
 
+November 22, 2013
+* finalizing first version of RUnit test (all old tests are now RUnit Tests)
+
 November 20, 2013
 * bugfix for boolean BSON values (github Issue #18)
 
