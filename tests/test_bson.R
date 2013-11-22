@@ -150,3 +150,20 @@ print(b)
 #print(l$city)
 #l$city <- "Detroit"
 #print(l)
+
+
+buf <- mongo.bson.buffer.create()
+l <- list(fruit = "apple", hasSeeds = TRUE)
+mongo.bson.buffer.append.list(buf, "item", l)
+b <- mongo.bson.from.buffer(buf)
+print(b)
+
+
+buf <- mongo.bson.buffer.create()
+undef <- mongo.undefined.create()
+mongo.bson.buffer.append(buf, "Undef", undef)
+l <- list(u1 = undef, One = 1)
+mongo.bson.buffer.append.list(buf, "listWundef", l)
+b <- mongo.bson.from.buffer(buf)
+print(b)
+print(mongo.bson.to.list(b))
