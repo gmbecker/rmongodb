@@ -1,7 +1,7 @@
 rmongodb
 ===================
 
-This is an R (www.r-project.org) extension supporting access to MongoDB (www.mongodb.org) using the mongodb-c-driver.
+This is an R (www.r-project.org) extension supporting access to MongoDB (www.mongodb.org) using the mongodb-c-driver (http://docs.mongodb.org/ecosystem/drivers/c/).
 
 The latest stable version is available on **CRAN**: http://cran.r-project.org/package=rmongodb
 
@@ -24,17 +24,20 @@ Once you have installed the package, it may be loaded from within R like any oth
     mongo <- mongo.create()
     
     # create query object 
-    buf <- mongo.bson.buffer.create()
-    mongo.bson.buffer.append(buf, "age", 18L)
-    query <- mongo.bson.from.buffer(buf)
+    query <- mongo.bson.from.JSON('{"age": 27}')
 
     # Find the first 100 records
-    #    in collection people of database test where age == 18
+    #    in collection people of database test where age == 27
     cursor <- mongo.find(mongo, "test.people", query, limit=100L)
     # Step though the matching records and display them
     while (mongo.cursor.next(cursor))
         print(mongo.cursor.value(cursor))
     mongo.cursor.destroy(cursor)
+    
+    res <- mongo.find.batch(mongo, "test.people", query, limit=100L)
+    
+    mongo.disconnect(mongo)
+    mongo.destroy(mongo)
 
 There is also one demo available:
   
