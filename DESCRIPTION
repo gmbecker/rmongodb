@@ -1,9 +1,9 @@
 Package: rmongodb
 Type: Package
 Title: R-MongoDB driver
-Version: 1.1.2
-Date: 2013-10-30
-Depends: R (>= 2.10)
+Version: 1.2.2
+Date: 2013-11-20
+Depends: R (>= 2.10), rjson
 Author: Gerald Lindsly & MongoDB, Inc. (mongo-c-driver) & Markus Schmidberger (mongosoup.de)
 Maintainer: Markus Schmidberger <markus@mongosoup.de>
 Description: This R package provides an interface to the NoSQL MongoDB database using the MongoDB C-driver.

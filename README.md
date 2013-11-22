@@ -3,7 +3,7 @@ rmongodb
 
 This is an R (www.r-project.org) extension supporting access to MongoDB (www.mongodb.org) using the mongodb-c-driver.
 
-The latest stable version will be soon available on **CRAN**: http://cran.r-project.org/package=rmongodb
+The latest stable version is available on **CRAN**: http://cran.r-project.org/package=rmongodb
 
 Thanks to Gerald Lindsly and MongoDB, Inc. (formerly 10gen) for all the initial work. 
 In October 2013, **MongoSoup** (www.mongosoup.de) has overtaken the development and maintenance of the R package. 
@@ -44,7 +44,7 @@ There is also one demo available:
 
 ### Supported Functionality by rmongodb
 * Connecting and disconnecting to MongoDB
-* Querying, inserting and updating to MongoDB
+* Querying, inserting and updating to MongoDB including with **JSON** and BSON
 * Creating and handling BSON objects
 * Dropping collections and databases on MongoDB
 * Creating indices on MongoDB collections
@@ -52,6 +52,7 @@ There is also one demo available:
 * Executing commands on MongoDB
 * Adding, removing, handling files on a "Grid File System" (GridFS) on a 
 MongoDB server
+* High Level functionality as mongo.apply, mongo.summary, mongo.get.keys, ...
 
 
 ### Good ressources to Get Started with rmongodb
@@ -99,8 +100,11 @@ To run the unit tests:
     
 We advice using RStudio (www.rstudio.org) for the package development. The RStudio .Rproj file is included in the repository.
 
+### Usefull links
+* BSON specification: http://bsonspec.org/#/specification
 
-
-
-
-
+### Versioning
+We use a three step version number system, e.g. v1.2.1:
+* first: major changes as new C libraries
+* second: for each new stable CRAN release
+* third: for each new github version ready for testing

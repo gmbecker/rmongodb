@@ -1,34 +1,28 @@
-\name{rmongodb-package}
-\alias{rmongodb-package}
-\alias{rmongodb}
 \docType{package}
-\title{
-R-MongoDB driver
-}
+\name{rmongodb-package}
+\alias{rmongodb}
+\alias{rmongodb-package}
+\title{R-MongoDB driver}
 \description{
-Provides an interface to MongoDB for R
+  Provides an interface to MongoDB for R
 }
 \details{
-\tabular{ll}{
-Package: \tab rmongodb\cr
-Type: \tab Package\cr
-Version: \tab 1.0.5\cr
-Date: \tab 2012-12-22\cr
-License: \tab Apache License 2.0\cr
-LazyLoad: \tab yes\cr
-}
-Overview
+  \tabular{ll}{ Package: \tab rmongodb\cr Type: \tab
+  Package\cr Version: \tab 1.0.5\cr Date: \tab
+  2012-12-22\cr License: \tab Apache License 2.0\cr
+  LazyLoad: \tab yes\cr } Overview
 }
 \author{
-Gerald Lindsly & 10gen, Inc. (mongo-c-driver)
+  Gerald Lindsly & MongoDB, Inc. (mongo-c-driver) & Markus
+  Schmidberger (mongosoup.de)
 
-Maintainer: Gerald Lindsly
-gerald.lindsly@gmail.com
-}
-\seealso{
-\link{mongo}
+  Maintainer: Markus Schmidberger <markus
 }
 \references{
-http://www.mongodb.org
+  http://www.mongodb.org
 }
-\keyword{ package }
+\seealso{
+  \link{mongo}
+}
+\keyword{package}
+

@@ -1,0 +1,36 @@
+rmongodb NEWS
+========================================================
+
+November 20, 2013
+* bugfix for boolean BSON values (github Issue #18)
+
+November 4, 2013
+* introduction of first mongo high level functionality
+** mongo.get.keys - to get all keys from a collection
+** mongo.summary - to get summary statistics all keys in a collection
+* JSON 2 BSON implemented
+** mongo.bson.from.JSON 
+* code to deal with cursors
+** mongo.cursor.to.list
+** mongo.cursor.to.data.frame
+
+November 2, 2013
+* use roxygen for documentation
+* implementing first high level functions
+
+October 31, 2013 - v1.1.3
+* bcon.c / bcon.h removed -> no more build warnings
+* NEWS file fixed for CRAN style
+
+October 30, 2013
+* zips example data added
+* all build errors removed
+* submission to CRAN :-)
+
+October 25, 2013
+* **mongo.find.all** function added
+* most build errors removed
+
+October 24, 2013 - v1.1.0
+* MongoSoup and Markus Schmidberger <markus@mongosoup.de> is overtaking the development and maintenance
+* github fork created, repo cleaning and first bug fixes
