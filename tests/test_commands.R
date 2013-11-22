@@ -1,88 +1,97 @@
 library(rmongodb)
 library(RUnit)
 
+# 18 tests
+# 22.11.2013
+
 mongo <- mongo.create()
-if (!mongo.is.connected(mongo))
-  stop("No connnection")
 
-print(mongo.get.primary(mongo))
-print(sprintf("IsMaster (%s)", if (mongo.is.master(mongo)) "Yes" else "No"))
-mongo.set.timeout(mongo, 2000)
-print(mongo.get.timeout(mongo))
+# empty test db
+db <- "rmongodb"
+ns <- paste(db, "test_commands", sep=".")
+mongo.drop(mongo, ns)
 
-print(mongo.simple.command(mongo, "admin", "buildInfo", 1))
+if( mongo.is.connected(mongo) ){
+  
+  print(mongo.get.primary(mongo))
+  test <- mongo.is.master(mongo)
+  print(sprintf("IsMaster (%s)", if (test) "Yes" else "No"))
+  checkTrue(test)
+  
+  t <- 2000
+  mongo.set.timeout(mongo, t)
+  tout <- mongo.get.timeout(mongo)
+  checkEquals(t, tout)
+  
+  out <- mongo.simple.command(mongo, "admin", "buildInfo", 1)
+  print(out)
+  checkEquals( class(out), "mongo.bson")
+  checkEquals( mongo.bson.value(out, "ok"), 1 )
+  
+  out <- mongo.get.databases(mongo)
+  print(out)
+  checkTrue( any(out=="rmongodb") )
+  
+  out <- mongo.simple.command(mongo, "admin", "top", 1L) 
+  checkEquals( mongo.bson.value(out, "ok"), 1 )
+  checkEquals( class(out), "mongo.bson")
+  
+  checkTrue(!mongo.drop(mongo, ns))
+  mongo.insert(mongo, ns, mongo.bson.from.JSON('{"a":5}'))
+  print(paste("drop collection", ns))
+  checkTrue(mongo.drop(mongo, ns))
 
-print(mongo.get.databases(mongo))
-#print(mongo.simple.command(mongo, "admin", "top", 1L))
+  print("drop database")
+  checkTrue(mongo.drop.database(mongo, db))
+  
+  print("add user")
+  checkTrue(mongo.add.user(mongo, "Gerald", "PaSsWoRd"))
+  
+  # create error
+  mongo.simple.command(mongo, db, "badcommand", 0L)
+  err <- mongo.get.err(mongo)
+  print(err)
+  checkTrue( is.integer(err) )
+  mongo.reset.err(mongo, db)
+  
+  print("rename collection")
+  for( i in 1:100){
+    mongo.insert(mongo, ns, mongo.bson.from.JSON(paste('{"a":',i,'}')))
+  }
+  buf <- mongo.bson.buffer.create()
+  mongo.bson.buffer.append(buf, "renameCollection", ns)
+  mongo.bson.buffer.append(buf, "to", "rmongodb.test_new")
+  command <- mongo.bson.from.buffer(buf)
+  out <- mongo.command(mongo, "admin", command)
+  print(out)
+  checkEquals( class(out), "mongo.bson")
+  checkEquals( mongo.bson.value(out, "ok"), 1 )
+  
+  ns <- "rmongodb.test_new"
+  
+  print("count check")
+  count1 <- mongo.count(mongo, ns)
+  print(count1)
+  buf <- mongo.bson.buffer.create()
+  mongo.bson.buffer.append(buf, "count", "test_new")
+  mongo.bson.buffer.append(buf, "query", mongo.bson.empty())
+  command <- mongo.bson.from.buffer(buf)
+  count2 <- mongo.command(mongo, "rmongodb", command)
+  print(count2)
+  checkEquals( class(count2), "mongo.bson")
+  checkEquals( mongo.bson.value(count2, "ok"), 1 )
+  checkEquals( count1, mongo.bson.value(count2, "n"))
+  
+  
+  buf <- mongo.bson.buffer.create()
+  mongo.bson.buffer.append(buf, "name", "Ford")
+  mongo.bson.buffer.append(buf, "engine", "Vv8")
+  z <- mongo.bson.from.buffer(buf)
+  mongo.insert(mongo, "rmongodb.test_new2", z)
+  out <- mongo.get.database.collections(mongo, "rmongodb")
+  checkEquals( length(out), 2)
 
-db <- "test"
-ns <- paste(db, "test", sep=".")
-print("drop collection x2")
-print(mongo.drop(mongo, ns))
-print(mongo.drop(mongo, "foo.bar"))
-print("drop database")
-print(mongo.drop.database(mongo, db))
+}
 
-print("test add dup key")
-ns <- paste(db, "people", sep=".")
-mongo.index.create(mongo, ns, "name", mongo.index.unique)
-
-
-# test various other database ops
-
-print("add user")
-print(mongo.add.user(mongo, "Gerald", "PaSsWoRd"))
-
-mongo.simple.command(mongo, db, "badcommand", 0L)
-print(mongo.get.err(mongo))
-
-
-
-
-buf <- mongo.bson.buffer.create()
-mongo.bson.buffer.append(buf, "name", "")
-mongo.bson.buffer.append(buf, "age", 1L)
-b <- mongo.bson.from.buffer(buf)
-print("index create")
-print(mongo.index.create(mongo, ns, b))
-
-print("rename")
-buf <- mongo.bson.buffer.create()
-mongo.bson.buffer.append(buf, "renameCollection", ns)
-mongo.bson.buffer.append(buf, "to", "foo.humans")
-command <- mongo.bson.from.buffer(buf)
-print(mongo.command(mongo, "admin", command))
-ns <- "foo.humans"
-
-print("count x2")
-print(mongo.count(mongo, ns))
-buf <- mongo.bson.buffer.create()
-mongo.bson.buffer.append(buf, "count", "humans")
-mongo.bson.buffer.append(buf, "query", mongo.bson.empty())
-command <- mongo.bson.from.buffer(buf)
-print(mongo.command(mongo, "foo", command))
-
-buf <- mongo.bson.buffer.create()
-mongo.bson.buffer.append(buf, "name", "Ford")
-mongo.bson.buffer.append(buf, "engine", "Vv8")
-z <- mongo.bson.from.buffer(buf)
-mongo.insert(mongo, "foo.cars", z)
-
-print(mongo.get.database.collections(mongo, "foo"))
-
-buf <- mongo.bson.buffer.create()
-l <- list(fruit = "apple", hasSeeds = TRUE)
-mongo.bson.buffer.append.list(buf, "item", l)
-b <- mongo.bson.from.buffer(buf)
-print(b)
-
-
-buf <- mongo.bson.buffer.create()
-undef <- mongo.undefined.create()
-mongo.bson.buffer.append(buf, "Undef", undef)
-l <- list(u1 = undef, One = 1)
-mongo.bson.buffer.append.list(buf, "listWundef", l)
-b <- mongo.bson.from.buffer(buf)
-print(b)
-print(mongo.bson.to.list(b))
-
+mongo.disconnect(mongo)
+mongo.destroy(mongo)

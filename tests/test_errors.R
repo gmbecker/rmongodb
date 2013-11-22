@@ -1,12 +1,40 @@
 library(rmongodb)
 library(RUnit)
 
-err <- mongo.get.last.err(mongo, db)
-print(mongo.get.server.err(mongo))
-iter = mongo.bson.find(err, "code")
-print(mongo.bson.iterator.value(iter))
-print(mongo.get.server.err.string(mongo))
-iter = mongo.bson.find(err, "err")
-print(mongo.bson.iterator.value(iter))
+# 5 tests
+# 22.11.2013
 
-mongo.reset.err(mongo, db)
+mongo <- mongo.create()
+
+# empty test db
+db <- "rmongodb"
+ns <- paste(db, "test_errors", sep=".")
+mongo.drop(mongo, ns)
+
+if( mongo.is.connected(mongo) ){
+
+  mongo.insert(mongo, ns, mongo.bson.from.JSON('{"$or":2}') )
+  err <- mongo.get.last.err(mongo, db)
+  print(mongo.get.server.err(mongo))
+  checkEquals( class(err), "mongo.bson")
+  
+  iter <- mongo.bson.find(err, "code")
+  print(mongo.bson.iterator.value(iter))
+  checkEquals( mongo.bson.iterator.value(iter), 13511)
+  
+  err_str <- mongo.get.server.err.string(mongo)
+  print(err_str)
+  checkTrue( is.character(err_str) )
+  
+  iter <- mongo.bson.find(err, "err")
+  err_str <- mongo.bson.iterator.value(iter)
+  print(err_str)
+  checkTrue( is.character(err_str) )
+  
+  out <- mongo.reset.err(mongo, db)
+  checkTrue( is.null( out ) )
+  
+}
+
+mongo.disconnect(mongo)
+mongo.destroy(mongo)
