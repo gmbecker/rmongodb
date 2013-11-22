@@ -93,10 +93,6 @@ To install the development version of rmongodb, it's easiest to use the devtools
     # install.packages("devtools")
     library(devtools)
     install_github("rmongodb", "mongosoup")
-
-To run the unit tests:
-
-    R --no-save < tests/test.R
     
 We advice using RStudio (www.rstudio.org) for the package development. The RStudio .Rproj file is included in the repository.
 
@@ -108,3 +104,8 @@ We use a three step version number system, e.g. v1.2.1:
 * first: major changes as new C libraries
 * second: for each new stable CRAN release
 * third: for each new github version ready for testing
+
+### General Development Rules
+* we use roxygen2
+* we write RUnit tests for all new functionality in tests/test_XXX.R
+* for bigger changes we use branches
