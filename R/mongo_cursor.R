@@ -1,4 +1,3 @@
-
 #' Convert Mongo Cursor Object to List 
 #' 
 #' Converts a mongo cursor object to a list by interating over all cursor objects and combining them.

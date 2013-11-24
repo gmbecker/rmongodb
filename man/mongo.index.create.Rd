@@ -18,7 +18,11 @@
 
   Alternately, \code{key} may be a list which will be
   converted to a mongo.bson object by
-  \code{\link{mongo.bson.from.list}()}.}
+  \code{\link{mongo.bson.from.list}()}.
+
+  Alternately, \code{key} may be a valid JSON character
+  string which will be converted to a mongo.bson object by
+  \code{\link{mongo.bson.from.JSON}()}.}
 
   \item{options}{(integer vector) Optional flags governing
   the operation: \itemize{
@@ -45,7 +49,7 @@
 mongo <- mongo.create()
 if (mongo.is.connected(mongo)) {
     # Add a city index to collection people in database test
-    b <- mongo.index.create(mongo, "test.people", "city")
+    b <- mongo.index.create(mongo, "test.people", '{"city":1}')
     if (!is.null(b)) {
         print(b)
         stop("Server error")

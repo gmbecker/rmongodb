@@ -2,8 +2,10 @@ rmongodb NEWS
 ========================================================
 
 November 24, 2013
-* now using more stable RJSONIO
-* now package builds withou locally installe mongodb
+* using more stable RJSONIO
+* package builds without locally installe mongodb
+* everywhere direkt JSON queries (incl. sort and field) are enabled
+* mongo.is.connected check added to all function for more stability
 
 November 22, 2013
 * finalizing first version of RUnit test (all old tests are now RUnit Tests)

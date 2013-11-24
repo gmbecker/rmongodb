@@ -1,5 +1,3 @@
-
-
 #' Find one record in a collection
 #' 
 #' Find the first record in a collection that matches a given query.
@@ -19,6 +17,9 @@
 #' 
 #' Alternately, \code{query} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{query} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @param fields (\link{mongo.bson}) The desired fields which are to be
 #' returned frtom the matching record.  The default of mongo.bson.empty() will
 #' cause all fields of the matching record to be returned; however, specific
@@ -26,6 +27,9 @@
 #' 
 #' Alternately, \code{fields} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{fields} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @return NULL if no record matching the criteria is found; otherwise,
 #' 
 #' (\link{mongo.bson}) The matching record/fields.
@@ -71,10 +75,21 @@
 #' 
 #' @export mongo.find.one
 mongo.find.one <- function(mongo, ns, query=mongo.bson.empty(), fields=mongo.bson.empty()) {
-  if (typeof(query) == "list")
-    query <- mongo.bson.from.list(query)
-  if (typeof(fields) == "list")
-    fields <- mongo.bson.from.list(fields)
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  #validate and process input
+  query <- switch( class(query),
+          "mongo.bson" = query,
+          "list" = mongo.bson.from.list(query),
+          "character" = mongo.bson.from.JSON(query) )
+  fields <- switch( class(fields),
+                   "mongo.bson" = fields,
+                   "list" = mongo.bson.from.list(fields),
+                   "character" = mongo.bson.from.JSON(fields) )
+  
   .Call(".mongo.find.one", mongo, ns, query, fields)
 }
 
@@ -166,6 +181,9 @@ mongo.find.partial.results   <- 128L
 #' 
 #' Alternately, \code{query} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{query} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @param sort (\link{mongo.bson}) The desired fields by which to sort the
 #' returned records. The default of mongo.bson.empty() indicates that no
 #' special sorting is to be done; the records will come back in the order that
@@ -173,6 +191,9 @@ mongo.find.partial.results   <- 128L
 #' 
 #' Alternately, \code{sort} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{sort} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @param fields (\link{mongo.bson}) The desired fields which are to be
 #' returned from the matching record.  The default of mongo.bson.empty() will
 #' cause all fields of the matching record to be returned; however, specific
@@ -180,6 +201,9 @@ mongo.find.partial.results   <- 128L
 #' 
 #' Alternately, \code{fields} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{fields} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @param limit (as.integer) The maximum number of records to be returned. A
 #' limit of 0L will return all matching records not skipped.
 #' @param skip (as.integer) The number of matching records to skip before
@@ -225,12 +249,25 @@ mongo.find.partial.results   <- 128L
 #' 
 #' @export mongo.find
 mongo.find <- function(mongo, ns, query=mongo.bson.empty(), sort=mongo.bson.empty(), fields=mongo.bson.empty(), limit=0L, skip=0L, options=0L) {
-  if (typeof(query) == "list")
-    query <- mongo.bson.from.list(query)
-  if (typeof(sort) == "list")
-    sort <- mongo.bson.from.list(sort)
-  if (typeof(fields) == "list")
-    fields <- mongo.bson.from.list(fields)
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  #validate and process input
+  query <- switch( class(query),
+                   "mongo.bson" = query,
+                   "list" = mongo.bson.from.list(query),
+                   "character" = mongo.bson.from.JSON(query) )
+  sort <- switch( class(sort),
+                    "mongo.bson" = sort,
+                    "list" = mongo.bson.from.list(sort),
+                    "character" = mongo.bson.from.JSON(sort) )
+  fields <- switch( class(fields),
+                    "mongo.bson" = fields,
+                    "list" = mongo.bson.from.list(fields),
+                    "character" = mongo.bson.from.JSON(fields) )
+  
   .Call(".mongo.find", mongo, ns, query, sort, fields, limit, skip, options)
 }
 
@@ -252,6 +289,9 @@ mongo.find <- function(mongo, ns, query=mongo.bson.empty(), sort=mongo.bson.empt
 #' 
 #' Alternately, \code{query} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{query} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @param sort (\link{mongo.bson}) The desired fields by which to sort the
 #' returned records. The default of mongo.bson.empty() indicates that no
 #' special sorting is to be done; the records will come back in the order that
@@ -259,6 +299,9 @@ mongo.find <- function(mongo, ns, query=mongo.bson.empty(), sort=mongo.bson.empt
 #' 
 #' Alternately, \code{sort} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{sort} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @param fields (\link{mongo.bson}) The desired fields which are to be
 #' returned from the matching record.  The default of mongo.bson.empty() will
 #' cause all fields of the matching record to be returned; however, specific
@@ -266,6 +309,9 @@ mongo.find <- function(mongo, ns, query=mongo.bson.empty(), sort=mongo.bson.empt
 #' 
 #' Alternately, \code{fields} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{fields} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @param limit (as.integer) The maximum number of records to be returned. A
 #' limit of 0L will return all matching records not skipped.
 #' @param skip (as.integer) The number of matching records to skip before
@@ -314,6 +360,10 @@ mongo.find.all <- function(mongo, ns,
                            options=0L,
                            data.frame=FALSE, ...) {
   
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
   cursor <- mongo.find(mongo, ns, query=query, sort=sort, fields=fields, limit=limit, skip=skip, options=options)
   
   if( data.frame == TRUE ){
@@ -344,6 +394,9 @@ mongo.find.batch <- mongo.find.all
 #' 
 #' Alternately, \code{query} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{query} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @return (double) The number of matching records.
 #' @seealso \code{\link{mongo.find}},\cr \code{\link{mongo.find.one}},\cr
 #' \code{\link{mongo.insert}},\cr \code{\link{mongo.update}},\cr
@@ -385,8 +438,17 @@ mongo.find.batch <- mongo.find.all
 #' 
 #' @export mongo.count
 mongo.count <- function(mongo, ns, query=mongo.bson.empty()) {
-  if (typeof(query) == "list")
-    query <- mongo.bson.from.list(query)
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  #validate and process input
+  query <- switch( class(query),
+                   "mongo.bson" = query,
+                   "list" = mongo.bson.from.list(query),
+                   "character" = mongo.bson.from.JSON(query) )
+
   .Call(".mongo.count", mongo, ns, query)
 }
 

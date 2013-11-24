@@ -57,51 +57,6 @@ mongo.create <- function(host="127.0.0.1", name="", username="", password="", db
 }
 
 
-
-
-
-
-#' Retrieve an connection error code from a mongo object
-#' 
-#' Retrieve an connection error code from a mongo object indicating the failure
-#' code if mongo.create() failed.
-#' 
-#' 
-#' @param mongo (\link{mongo}) a mongo connection object.
-#' @return (integer) error code as follows:
-#' 
-#' mongo.create() errors:
-#' 
-#' Other errors:
-#' @returnItem 0 No Error
-#' @returnItem 1 No socket - Could not create socket.
-#' @returnItem 2 Fail - An error occurred attempting to connect to socket
-#' @returnItem 3 Address fail - An error occured calling getaddrinfo().
-#' @returnItem 4 Not Master - Warning: connected to a non-master node
-#' (read-only).
-#' @returnItem 5 Bad set name - given name doesn't match the replica set.
-#' @returnItem 6 No Primary - Cannot find primary in replica set - connection
-#' closed.
-#' @returnItem 7 I/O error - An error occured reading or writing on the socket.
-#' @returnItem 8 Read size error - The response is not the expected length.
-#' @returnItem 9 Command failed - The command returned with 'ok' value of 0.
-#' @returnItem 10 BSON invalid - Not valid for the specified operation.
-#' @returnItem 11 BSON not finished - should not occur with R driver.
-#' @seealso \code{\link{mongo.create}},\cr \link{mongo}
-#' @examples
-#' 
-#' mongo <- mongo.create()
-#' if (!mongo.is.connected(mongo)) {
-#'     print("Unable to connect.  Error code:")
-#'     print(mongo.get.err(mongo))
-#' }
-#' 
-#' @export mongo.get.err
-mongo.get.err <- function(mongo)
-    .Call(".mongo.get.err", mongo)
-
-
-
 #' Disconnect from a MongoDB server
 #' 
 #' Disconnect from a MongoDB server.  No further communication is possible on
@@ -122,9 +77,14 @@ mongo.get.err <- function(mongo)
 #' }
 #' 
 #' @export mongo.disconnect
-mongo.disconnect <- function(mongo)
-    .Call(".mongo.disconnect", mongo)
-
+mongo.disconnect <- function(mongo){
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  .Call(".mongo.disconnect", mongo)
+}
 
 
 #' Reconnect to a MongoDB server
@@ -175,9 +135,9 @@ mongo.reconnect <- function(mongo)
 #' }
 #' 
 #' @export mongo.destroy
-mongo.destroy <- function(mongo)
-    .Call(".mongo.destroy", mongo)
-
+mongo.destroy <- function(mongo){  
+  .Call(".mongo.destroy", mongo)
+}
 
 
 #' Determine if a mongo object is connected to a MongoDB server
@@ -295,9 +255,14 @@ mongo.get.hosts <- function(mongo)
 #' }
 #' 
 #' @export mongo.set.timeout
-mongo.set.timeout <- function(mongo, timeout)
-    .Call(".mongo.set.timeout", mongo, timeout)
-
+mongo.set.timeout <- function(mongo, timeout){
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  .Call(".mongo.set.timeout", mongo, timeout)
+}
 
 
 #' Get the timeout value of a mongo connection
@@ -320,9 +285,14 @@ mongo.set.timeout <- function(mongo, timeout)
 #' }
 #' 
 #' @export mongo.get.timeout
-mongo.get.timeout <- function(mongo)
-    .Call(".mongo.get.timeout", mongo)
-
+mongo.get.timeout <- function(mongo){  
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  .Call(".mongo.get.timeout", mongo)
+}
 
 
 #' Determine if a mongo connection object is connected to a master
@@ -378,9 +348,14 @@ mongo.is.master <- function(mongo)
 #'     mongo.authenticate(mongo, "Joe", "ZxYaBc217")
 #' 
 #' @export mongo.authenticate
-mongo.authenticate <- function(mongo, username, password, db="admin")
-    .Call(".mongo.authenticate", mongo, username, password, db)
-
+mongo.authenticate <- function(mongo, username, password, db="admin"){
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  .Call(".mongo.authenticate", mongo, username, password, db)
+}
 
 
 #' Add a user and password
@@ -405,255 +380,14 @@ mongo.authenticate <- function(mongo, username, password, db="admin")
 #'     mongo.add.user(mongo, "Jeff", "H87b5dog")
 #' 
 #' @export mongo.add.user
-mongo.add.user <- function(mongo, username, password, db="admin")
-    .Call(".mongo.add.user", mongo, username, password, db)
-
-
-
-#' Retrieve an server error code from a mongo connection object
-#' 
-#' Retrieve an server error record from a the MongoDB server.  This describes
-#' the last error that occurs while accessing the give database. While this
-#' function retrieves an error record in the form of a mongo.bson record, it
-#' also sets the values returned by \code{\link{mongo.get.server.err}()} and
-#' \code{\link{mongo.get.server.err.string}()}. You may find it more convenient
-#' using those after calling \code{mongo.get.last.err()} rather than unpacking
-#' the returned mongo.bson object.
-#' 
-#' 
-#' @param mongo (\link{mongo}) a mongo connection object.
-#' @param db (string) The name of the database for which to get the error
-#' status.
-#' @return NULL if no error was reported; otherwise,
-#' 
-#' (\link{mongo.bson}) This BSON object has the form { err : "\emph{error
-#' message string}", code : \emph{error code integer} }
-#' @seealso \code{\link{mongo.get.server.err}},\cr
-#' \code{\link{mongo.get.server.err.string}},\cr
-#' \code{\link{mongo.get.prev.err}}\cr \link{mongo}.
-#' @examples
-#' 
-#' mongo <- mongo.create()
-#' if (mongo.is.connected(mongo)) {
-#' 
-#'     # try adding a duplicate record when index doesn't allow this
-#' 
-#'     db <- "test"
-#'     ns <- "test.people"
-#'     mongo.index.create(mongo, ns, "name", mongo.index.unique)
-#' 
-#'     buf <- mongo.bson.buffer.create()
-#'     mongo.bson.buffer.append(buf, "name", "John")
-#'     mongo.bson.buffer.append(buf, "age", 22L)
-#'     b <- mongo.bson.from.buffer(buf)
-#'     mongo.insert(mongo, ns, b);
-#' 
-#'     buf <- mongo.bson.buffer.create()
-#'     mongo.bson.buffer.append(buf, "name", "John")
-#'     mongo.bson.buffer.append(buf, "age", 27L)
-#'     b <- mongo.bson.from.buffer(buf)
-#'     mongo.insert(mongo, ns, b);
-#' 
-#'     err <- mongo.get.last.err(mongo, db)
-#'     print(mongo.get.server.err(mongo))
-#'     print(mongo.get.server.err.string(mongo))
-#' }
-#' 
-#' @export mongo.get.last.err
-mongo.get.last.err <- function(mongo, db)
-    .Call(".mongo.get.last.err", mongo, db)
-
-
-
-#' Retrieve an server error code from a mongo connection object
-#' 
-#' Retrieve the previous server error record from a the MongoDB server.  While
-#' this function retrieves an error record in the form of a mongo.bson record,
-#' it also sets the values returned by \code{\link{mongo.get.server.err}()} and
-#' \code{\link{mongo.get.server.err.string}()}. You may find it more convenient
-#' using those after calling \code{mongo.get.prev.err()} rather than unpacking
-#' the returned mongo.bson object.
-#' 
-#' 
-#' @param mongo (\link{mongo}) a mongo connection object.
-#' @param db (string) The name of the database for which to get the error
-#' status.
-#' @return NULL if no error was reported; otherwise,
-#' 
-#' (\link{mongo.bson}) This BSON object has the form { err : "\emph{error
-#' message string}", code : \emph{error code integer} }
-#' @seealso \code{\link{mongo.get.server.err}},\cr
-#' \code{\link{mongo.get.server.err.string}},\cr
-#' \code{\link{mongo.get.last.err}}\cr \link{mongo}.
-#' @examples
-#' 
-#' mongo <- mongo.create()
-#' if (mongo.is.connected(mongo)) {
-#' 
-#'     # try adding a duplicate record when index doesn't allow this
-#' 
-#'     db <- "test"
-#'     ns <- "test.people"
-#'     mongo.index.create(mongo, ns, "name", mongo.index.unique)
-#' 
-#'     buf <- mongo.bson.buffer.create()
-#'     mongo.bson.buffer.append(buf, "name", "John")
-#'     mongo.bson.buffer.append(buf, "age", 22L)
-#'     b <- mongo.bson.from.buffer(buf)
-#'     mongo.insert(mongo, ns, b);
-#' 
-#'     buf <- mongo.bson.buffer.create()
-#'     mongo.bson.buffer.append(buf, "name", "John")
-#'     mongo.bson.buffer.append(buf, "age", 27L)
-#'     b <- mongo.bson.from.buffer(buf)
-#'     mongo.insert(mongo, ns, b);
-#' 
-#'     # try insert again
-#'     mongo.insert(mongo, ns, b);
-#' 
-#'     err <- mongo.get.prev.err(mongo, db)
-#'     print(mongo.get.server.err(mongo))
-#'     print(mongo.get.server.err.string(mongo))
-#' }
-#' 
-#' @export mongo.get.prev.err
-mongo.get.prev.err <- function(mongo, db)
-    .Call(".mongo.get.prev.err", mongo, db)
-
-
-
-#' Retrieve an server error code from a mongo connection object
-#' 
-#' Send a "reset error" command to the server, it also resets the values
-#' returned by\cr \code{\link{mongo.get.server.err}()} and
-#' \code{\link{mongo.get.server.err.string}()}.
-#' 
-#' 
-#' @param mongo (\link{mongo}) a mongo connection object.
-#' @param db (string) The name of the database on which to reset the error
-#' status.
-#' @return NULL
-#' @seealso \code{\link{mongo.get.server.err}},\cr
-#' \code{\link{mongo.get.server.err.string}},\cr
-#' \code{\link{mongo.get.last.err}},\cr \code{\link{mongo.get.prev.err}},\cr
-#' \link{mongo}.
-#' @examples
-#' 
-#' mongo <- mongo.create()
-#' if (mongo.is.connected(mongo)) {
-#' 
-#'     # try adding a duplicate record when index doesn't allow this
-#' 
-#'     db <- "test"
-#'     ns <- "test.people"
-#'     mongo.index.create(mongo, ns, "name", mongo.index.unique)
-#' 
-#'     buf <- mongo.bson.buffer.create()
-#'     mongo.bson.buffer.append(buf, "name", "John")
-#'     mongo.bson.buffer.append(buf, "age", 22L)
-#'     b <- mongo.bson.from.buffer(buf)
-#'     mongo.insert(mongo, ns, b);
-#' 
-#'     buf <- mongo.bson.buffer.create()
-#'     mongo.bson.buffer.append(buf, "name", "John")
-#'     mongo.bson.buffer.append(buf, "age", 27L)
-#'     b <- mongo.bson.from.buffer(buf)
-#'     mongo.insert(mongo, ns, b);
-#' 
-#'     err <- mongo.get.last.err(mongo, db)
-#'     print(mongo.get.server.err(mongo))
-#'     print(mongo.get.server.err.string(mongo))
-#'     mongo.reset.err(mongo, db)
-#' }
-#' 
-#' @export mongo.reset.err
-mongo.reset.err <- function(mongo, db)
-    .Call(".mongo.reset.err", mongo, db)
-
-
-
-#' Retrieve an server error code from a mongo connection object
-#' 
-#' Retrieve an server error code from a mongo connection object.
-#' 
-#' \code{\link{mongo.find}()}, \code{\link{mongo.find.one}()},
-#' \code{\link{mongo.index.create}()} set or clear this error code depending on
-#' whether they are successful or not.
-#' 
-#' \code{\link{mongo.get.last.err}()} and \code{\link{mongo.get.prev.err}()}
-#' both set or clear this error code according to what the server reports.
-#' 
-#' 
-#' @param mongo (\link{mongo}) a mongo connection object.
-#' @return (integer) Server error code
-#' @seealso \code{\link{mongo.get.server.err.string}},\cr
-#' \code{\link{mongo.get.last.err}},\cr \code{\link{mongo.get.prev.err}},\cr
-#' \code{\link{mongo.find}},\cr \code{\link{mongo.find.one}},\cr
-#' \code{\link{mongo.index.create}},\cr \link{mongo}.
-#' @examples
-#' 
-#' mongo <- mongo.create()
-#' if (mongo.is.connected(mongo)) {
-#'     # construct a query containing invalid operator
-#'     buf <- mongo.bson.buffer.create()
-#'     mongo.bson.buffer.start.object(buf, "age")
-#'     mongo.bson.buffer.append(buf, "$bad", 1L)
-#'     mongo.bson.buffer.finish.object(buf)
-#'     query <- mongo.bson.from.buffer(buf)
-#' 
-#'     result <- mongo.find.one(mongo, "test.people", query)
-#'     if (is.null(result)) {
-#'         print(mongo.get.server.err.string(mongo))
-#'         print(mongo.get.server.err(mongo))
-#'     }
-#' }
-#' 
-#' @export mongo.get.server.err
-mongo.get.server.err <- function(mongo)
-    .Call(".mongo.get.server.err", mongo)
-
-
-
-#' Retrieve an server error code from a mongo connection object
-#' 
-#' Retrieve an server error string from a mongo connection object.
-#' 
-#' \code{\link{mongo.find}()}, \code{\link{mongo.find.one}()},
-#' \code{\link{mongo.index.create}()} set or clear this error string depending
-#' on whether they are successful or not.
-#' 
-#' \code{\link{mongo.get.last.err}()} and \code{\link{mongo.get.prev.err}()}
-#' both set or clear this error string according to what the server reports.
-#' 
-#' 
-#' @param mongo (\link{mongo}) a mongo connection object.
-#' @return (string) Server error string
-#' @seealso \code{\link{mongo.get.server.err}},\cr
-#' \code{\link{mongo.get.last.err}},\cr \code{\link{mongo.get.prev.err}},\cr
-#' \code{\link{mongo.find}},\cr \code{\link{mongo.find.one}},\cr
-#' \code{\link{mongo.index.create}},\cr \link{mongo}.
-#' @examples
-#' 
-#' mongo <- mongo.create()
-#' if (mongo.is.connected(mongo)) {
-#'     # construct a query containing invalid operator
-#'     buf <- mongo.bson.buffer.create()
-#'     mongo.bson.buffer.start.object(buf, "age")
-#'     mongo.bson.buffer.append(buf, "$bad", 1L)
-#'     mongo.bson.buffer.finish.object(buf)
-#'     query <- mongo.bson.from.buffer(buf)
-#' 
-#'     result <- mongo.find.one(mongo, "test.people", query)
-#'     if (is.null(result)) {
-#'         print(mongo.get.server.err(mongo))
-#'         print(mongo.get.server.err.string(mongo))
-#'     }
-#' }
-#' 
-#' @export mongo.get.server.err.string
-mongo.get.server.err.string <- function(mongo)
-    .Call(".mongo.get.server.err.string", mongo)
-
+mongo.add.user <- function(mongo, username, password, db="admin"){
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  .Call(".mongo.add.user", mongo, username, password, db)
+}
 
 
 #' Issue a command to a database on MongoDB server
@@ -673,6 +407,9 @@ mongo.get.server.err.string <- function(mongo)
 #' 
 #' Alternately, \code{command} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{command} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @return NULL if the command failed.  \code{\link{mongo.get.err}()} may be
 #' MONGO_COMMAND_FAILED.
 #' 
@@ -712,9 +449,18 @@ mongo.get.server.err.string <- function(mongo)
 #' 
 #' @export mongo.command
 mongo.command <- function(mongo, db, command) {
-   if (typeof(command) == "list")
-        command <- mongo.bson.from.list(command)
-    .Call(".mongo.command", mongo, db, command)
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  #validate and process input
+  command <- switch( class(command),
+                      "mongo.bson" = command,
+                      "list" = mongo.bson.from.list(command),
+                      "character" = mongo.bson.from.JSON(command) )
+  
+  .Call(".mongo.command", mongo, db, command)
 }
 
 
@@ -754,9 +500,14 @@ mongo.command <- function(mongo, db, command) {
 #' }
 #' 
 #' @export mongo.simple.command
-mongo.simple.command <- function(mongo, db, cmdstr, arg)
-    .Call(".mongo.simple.command", mongo, db, cmdstr, arg)
-
+mongo.simple.command <- function(mongo, db, cmdstr, arg){
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  .Call(".mongo.simple.command", mongo, db, cmdstr, arg)
+}
 
 
 #' Drop a database from a MongoDB server
@@ -782,9 +533,14 @@ mongo.simple.command <- function(mongo, db, cmdstr, arg)
 #' }
 #' 
 #' @export mongo.drop.database
-mongo.drop.database <- function(mongo, db)
-    .Call(".mongo.drop.database", mongo, db)
-
+mongo.drop.database <- function(mongo, db){
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  .Call(".mongo.drop.database", mongo, db)
+}
 
 
 #' Drop a collection from a MongoDB server
@@ -811,9 +567,14 @@ mongo.drop.database <- function(mongo, db)
 #' }
 #' 
 #' @export mongo.drop
-mongo.drop <- function(mongo, ns)
-    .Call(".mongo.drop", mongo, ns)
-
+mongo.drop <- function(mongo, ns){
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  .Call(".mongo.drop", mongo, ns)
+}
 
 
 #' Rename a collection on a MongoDB server
@@ -840,9 +601,14 @@ mongo.drop <- function(mongo, ns)
 #' }
 #' 
 #' @export mongo.rename
-mongo.rename <- function(mongo, from.ns, to.ns)
-    .Call(".mongo.rename", mongo, from.ns, to.ns)
-
+mongo.rename <- function(mongo, from.ns, to.ns){
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  .Call(".mongo.rename", mongo, from.ns, to.ns)
+}
 
 
 #' Get a list of databases from a MongoDB server
@@ -866,9 +632,14 @@ mongo.rename <- function(mongo, from.ns, to.ns)
 #' }
 #' 
 #' @export mongo.get.databases
-mongo.get.databases <- function(mongo)
-    .Call(".mongo.get.databases", mongo)
-
+mongo.get.databases <- function(mongo){
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  .Call(".mongo.get.databases", mongo)
+}
 
 
 #' Get a list of collections in a database
@@ -897,5 +668,11 @@ mongo.get.databases <- function(mongo)
 #' }
 #' 
 #' @export mongo.get.database.collections
-mongo.get.database.collections <- function(mongo, db)
-    .Call(".mongo.get.database.collections", mongo, db)
+mongo.get.database.collections <- function(mongo, db){
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  .Call(".mongo.get.database.collections", mongo, db)
+}

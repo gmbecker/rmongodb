@@ -18,7 +18,11 @@
 
   Alternately, \code{query} may be a list which will be
   converted to a mongo.bson object by
-  \code{\link{mongo.bson.from.list}()}.}
+  \code{\link{mongo.bson.from.list}()}.
+
+  Alternately, \code{query} may be a valid JSON character
+  string which will be converted to a mongo.bson object by
+  \code{\link{mongo.bson.from.JSON}()}.}
 
   \item{fields}{(\link{mongo.bson}) The desired fields
   which are to be returned frtom the matching record.  The
@@ -29,7 +33,11 @@
 
   Alternately, \code{fields} may be a list which will be
   converted to a mongo.bson object by
-  \code{\link{mongo.bson.from.list}()}.}
+  \code{\link{mongo.bson.from.list}()}.
+
+  Alternately, \code{fields} may be a valid JSON character
+  string which will be converted to a mongo.bson object by
+  \code{\link{mongo.bson.from.JSON}()}.}
 }
 \value{
   NULL if no record matching the criteria is found;

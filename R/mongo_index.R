@@ -1,4 +1,3 @@
-
 #' mongo.index.create flag constant - unique keys
 #' 
 #' \code{\link{mongo.index.create}()} flag constant - unique keys (no
@@ -57,6 +56,9 @@ mongo.index.sparse     <- 16L
 #' 
 #' Alternately, \code{key} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{key} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @param options (integer vector) Optional flags governing the operation:
 #' \itemize{ \item\code{\link{mongo.index.unique}}
 #' \item\code{\link{mongo.index.drop.dups}}
@@ -74,7 +76,7 @@ mongo.index.sparse     <- 16L
 #' mongo <- mongo.create()
 #' if (mongo.is.connected(mongo)) {
 #'     # Add a city index to collection people in database test
-#'     b <- mongo.index.create(mongo, "test.people", "city")
+#'     b <- mongo.index.create(mongo, "test.people", '{"city":1}')
 #'     if (!is.null(b)) {
 #'         print(b)
 #'         stop("Server error")
@@ -98,8 +100,23 @@ mongo.index.sparse     <- 16L
 #' 
 #' @export mongo.index.create
 mongo.index.create <- function(mongo, ns, key, options=0L) {
-  if (typeof(key) == "list")
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  #validate and process input
+  if( class(key) == "mongo.bson"){
+    key <- key
+  } else if ( class(key) == "list"){
     key <- mongo.bson.from.list(key)
+  } else if ( class(key) == "character"){
+    if( isValidJSON(I(key)))
+        key <- mongo.bson.from.JSON(key)
+    else
+      key <- key
+  }
+  
   .Call(".mongo.index.create", mongo, ns, key, options)
 }
 

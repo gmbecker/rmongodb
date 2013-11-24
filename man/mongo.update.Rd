@@ -15,13 +15,21 @@
 
   Alternately, \code{criteria} may be a list which will be
   converted to a mongo.bson object by
-  \code{\link{mongo.bson.from.list}()}.}
+  \code{\link{mongo.bson.from.list}()}.
+
+  Alternately, \code{criteria} may be a valid JSON
+  character string which will be converted to a mongo.bson
+  object by \code{\link{mongo.bson.from.JSON}()}.}
 
   \item{objNew}{(\link{mongo.bson}) The replacement object.
 
   Alternately, \code{objNew} may be a list which will be
   converted to a mongo.bson object by
-  \code{\link{mongo.bson.from.list}()}.}
+  \code{\link{mongo.bson.from.list}()}.
+
+  Alternately, \code{objNew} may be a valid JSON character
+  string which will be converted to a mongo.bson object by
+  \code{\link{mongo.bson.from.JSON}()}.}
 
   \item{flags}{(integer vector) A list of optional flags
   governing the operation: \itemize{

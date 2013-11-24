@@ -1,5 +1,3 @@
-
-
 #' Add record to a collection
 #' 
 #' Add record to a collection.
@@ -39,8 +37,17 @@
 #' 
 #' @export mongo.insert
 mongo.insert <- function(mongo, ns, b) {
-  if (typeof(b) == "list")
-    b <- mongo.bson.from.list(b)
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  #validate and process input
+  b <- switch( class(b),
+                   "mongo.bson" = b,
+                   "list" = mongo.bson.from.list(b),
+                   "character" = mongo.bson.from.JSON(b) )
+
   .Call(".mongo.insert", mongo, ns, b)
 }
 
@@ -89,9 +96,14 @@ mongo.insert <- function(mongo, ns, b) {
 #' }
 #' 
 #' @export mongo.insert.batch
-mongo.insert.batch <- function(mongo, ns, lst)
-  .Call(".mongo.insert.batch", mongo, ns, lst)
+mongo.insert.batch <- function(mongo, ns, lst){
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
 
+  .Call(".mongo.insert.batch", mongo, ns, lst)
+}
 
 
 
@@ -148,10 +160,16 @@ mongo.update.basic  <- 4L
 #' 
 #' Alternately, \code{criteria} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{criteria} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @param objNew (\link{mongo.bson}) The replacement object.
 #' 
 #' Alternately, \code{objNew} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{objNew} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @param flags (integer vector) A list of optional flags governing the
 #' operation: \itemize{ \item\code{\link{mongo.update.upsert}}: insert ObjNew
 #' into the database if no record matching criteria is found.
@@ -201,10 +219,21 @@ mongo.update.basic  <- 4L
 #' 
 #' @export mongo.update
 mongo.update <- function(mongo, ns, criteria, objNew, flags=0L) {
-  if (typeof(criteria) == "list")
-    criteria <- mongo.bson.from.list(criteria)
-  if (typeof(objNew) == "list")
-    objNew <- mongo.bson.from.list(objNew)
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  #validate and process input
+  criteria <- switch( class(criteria),
+                   "mongo.bson" = criteria,
+                   "list" = mongo.bson.from.list(criteria),
+                   "character" = mongo.bson.from.JSON(criteria) )
+  objNew <- switch( class(objNew),
+                  "mongo.bson" = objNew,
+                  "list" = mongo.bson.from.list(objNew),
+                  "character" = mongo.bson.from.JSON(objNew) )
+
   .Call(".mongo.update", mongo, ns, criteria, objNew, flags)
 }
 
@@ -225,6 +254,9 @@ mongo.update <- function(mongo, ns, criteria, objNew, flags=0L) {
 #' 
 #' Alternately, \code{criteria} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{criteria} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
 #' @seealso \link{mongo},\cr \link{mongo.bson},\cr
 #' \code{\link{mongo.insert}},\cr \code{\link{mongo.update}},\cr
 #' \code{\link{mongo.find}},\cr \code{\link{mongo.find.one}}.
@@ -249,8 +281,17 @@ mongo.update <- function(mongo, ns, criteria, objNew, flags=0L) {
 #' 
 #' @export mongo.remove
 mongo.remove <- function(mongo, ns, criteria=mongo.bson.empty()) {
-  if (typeof(criteria) == "list")
-    criteria <- mongo.bson.from.list(criteria)
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  #validate and process input
+  criteria <- switch( class(criteria),
+                      "mongo.bson" = criteria,
+                      "list" = mongo.bson.from.list(criteria),
+                      "character" = mongo.bson.from.JSON(criteria) )
+  
   .Call(".mongo.remove", mongo, ns, criteria)
 }
 
