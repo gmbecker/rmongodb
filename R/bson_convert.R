@@ -18,9 +18,11 @@
 #' @export mongo.bson.from.JSON
 mongo.bson.from.JSON <- function(JSON, ...){
   
-  #isValidJSON(JSON)
+  if( !isValidJSON(I(JSON)) ){
+    stop("Not a valid JSON content: ", JSON)
+  }
   
-  json_list <- fromJSON(JSON, ...)
+  json_list <- fromJSON(JSON, simplify=FALSE, ...)
   
   if( length(json_list) == 0 ){
     bson <- mongo.bson.empty()
