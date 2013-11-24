@@ -3,6 +3,7 @@ rmongodb NEWS
 
 November 24, 2013
 * now using more stable RJSONIO
+* now package builds withou locally installe mongodb
 
 November 22, 2013
 * finalizing first version of RUnit test (all old tests are now RUnit Tests)
