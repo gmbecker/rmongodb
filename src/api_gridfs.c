@@ -89,7 +89,7 @@ SEXP mongo_gridfs_store_file(SEXP gfs, SEXP filename, SEXP remotename, SEXP cont
     const char* _contenttype = CHAR(STRING_ELT(contenttype, 0));
     SEXP ret;
     PROTECT(ret = allocVector(LGLSXP, 1));
-    LOGICAL(ret)[0] = (gridfs_store_file(_gfs, _filename, _remotename, _contenttype) == MONGO_OK);
+    LOGICAL(ret)[0] = (gridfs_store_file(_gfs, _filename, _remotename, _contenttype, GRIDFILE_DEFAULT) == MONGO_OK);
     UNPROTECT(1);
     return ret;
 }
@@ -146,7 +146,7 @@ SEXP mongo_gridfile_writer_create(SEXP gfs, SEXP remotename, SEXP contenttype) {
     PROTECT(cls = allocVector(STRSXP, 1));
     SET_STRING_ELT(cls, 0, mkChar("mongo.gridfile.writer"));
     classgets(ret, cls);
-    gridfile_writer_init(gfile, _gfs, _remotename, _contenttype);
+    gridfile_writer_init(gfile, _gfs, _remotename, _contenttype, GRIDFILE_DEFAULT);
     UNPROTECT(3);
     return ret;
 }
@@ -190,7 +190,7 @@ SEXP mongo_gridfs_store(SEXP gfs, SEXP raw, SEXP remotename, SEXP contenttype) {
     int len = LENGTH(raw);
     SEXP ret;
     PROTECT(ret = allocVector(LGLSXP, 1));
-    LOGICAL(ret)[0] = (gridfs_store_buffer(_gfs, (char*)RAW(raw), len, _remotename, _contenttype) == MONGO_OK);
+    LOGICAL(ret)[0] = (gridfs_store_buffer(_gfs, (char*)RAW(raw), len, _remotename, _contenttype, GRIDFILE_DEFAULT) == MONGO_OK);
     UNPROTECT(1);
     return ret;
 }
@@ -305,7 +305,7 @@ SEXP mongo_gridfile_get_descriptor(SEXP gfile) {
 SEXP mongo_gridfile_get_metadata(SEXP gfile) {
     gridfile* _gfile = _checkGridfile(gfile);
     bson meta;
-    gridfile_get_metadata(_gfile, &meta);
+    gridfile_get_metadata(_gfile, &meta, 0);
     if (bson_size(&meta) <= 5)
         return R_NilValue;
     SEXP ret = _mongo_bson_create(&meta);
