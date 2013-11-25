@@ -1,8 +1,8 @@
 library(rmongodb)
 library(RUnit)
 
-# 8 tests
-# 22.11.2013
+# 17 tests
+# 25.11.2013
 
 mongo <- mongo.create()
 
@@ -30,6 +30,8 @@ if( mongo.is.connected(mongo) ){
   mongo.bson.buffer.append(buf, "age", 24L)
   z <- mongo.bson.from.buffer(buf)
   mongo.insert.batch(mongo, ns, list(x, y, z))
+    # insert with JSON
+  mongo.insert(mongo, ns, '{"name":"Peter", "city":"Rom", "age":21}')
   
   
   # create bad query
@@ -55,8 +57,13 @@ if( mongo.is.connected(mongo) ){
   mongo.bson.buffer.append(buf, "name", "Dave")
   query  <- mongo.bson.from.buffer(buf)
   result <- mongo.find.one(mongo, ns, query)
+  checkEquals( class(result), "mongo.bson")
   checkEquals( mongo.bson.value(result, "name"), "Dave")
   
+  # good query with find.one and JSON
+  result <- mongo.findOne(mongo, ns, '{"name":"Peter"}')
+  checkEquals( class(result), "mongo.bson")
+  checkEquals( mongo.bson.value(result, "name"), "Peter")
   
   # good query with find and bson find
   iter <- mongo.bson.find(result, "city")
@@ -67,7 +74,7 @@ if( mongo.is.connected(mongo) ){
     query <- mongo.bson.from.buffer(buf)
     #print(paste("find city: ", city, sep=""))
     res <- mongo.find.one(mongo, ns, query)
-    checkEquals( mongo.bson.value(res, "city"), "Munich")    
+    checkEquals( mongo.bson.value(res, "city"), "Rom")    
   }
   
   
@@ -78,15 +85,26 @@ if( mongo.is.connected(mongo) ){
   while (mongo.cursor.next(cursor))
     res <- rbind(res, mongo.bson.to.list(mongo.cursor.value(cursor)))
   mongo.cursor.destroy(cursor)  
+  checkEquals( class(res), "list")
   checkEquals( dim(res), c(3,4))
   checkIdentical( sort(unlist(res[, "city"])) , unlist(res[, "city"]))
   
+  # good query with find and sort and JSON
+  res <- mongo.find.batch(mongo, ns, '{"age":{"$gt":21}}', sort='{"age":1}', data.frame=TRUE)
+  checkEquals( class(res), "data.frame")
+  checkTrue( !is.unsorted( res[,"age"] ) )
   
+  # good query with find and sort and fields and JSON
+  res <- mongo.find.batch(mongo, ns, '{"age":{"$lt":30}}', 
+                          sort='{"age":1}', fields='{"city":0}', data.frame=TRUE)
+  checkEquals( class(res), "data.frame")
+  checkTrue( !is.unsorted( res[,"age"] ) )
+  checkEquals( colnames(res), c("name", "age"))
   
   # good query with find.all
   res <- mongo.find.all(mongo, ns)  
-  checkEquals( dim(res), c(3,4))
-  checkTrue( is.list(res))
+  checkEquals( dim(res), c(4,4) )
+  checkTrue( is.list(res) )
   
 }
 
