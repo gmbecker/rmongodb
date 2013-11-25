@@ -1,6 +1,11 @@
 rmongodb NEWS
 ========================================================
 
+November 25, 2013
+* version dump and new CRAN submission
+* more tests for JSON input
+* mongo.findOne as alias for mongo.find.one
+
 November 24, 2013
 * using more stable RJSONIO
 * package builds without locally installe mongodb
