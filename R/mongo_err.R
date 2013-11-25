@@ -34,11 +34,6 @@
 #' 
 #' @export mongo.get.err
 mongo.get.err <- function(mongo){
-  
-  #check for mongodb connection
-  if( !mongo.is.connected(mongo))
-    stop("No mongoDB connection!")
-  
   .Call(".mongo.get.err", mongo)
 }
 
@@ -95,11 +90,6 @@ mongo.get.err <- function(mongo){
 #' 
 #' @export mongo.get.last.err
 mongo.get.last.err <- function(mongo, db){
-  
-  #check for mongodb connection
-  if( !mongo.is.connected(mongo))
-    stop("No mongoDB connection!")
-  
   .Call(".mongo.get.last.err", mongo, db)
 }
 
@@ -157,11 +147,6 @@ mongo.get.last.err <- function(mongo, db){
 #' 
 #' @export mongo.get.prev.err
 mongo.get.prev.err <- function(mongo, db){
-  
-  #check for mongodb connection
-  if( !mongo.is.connected(mongo))
-    stop("No mongoDB connection!")
-  
   .Call(".mongo.get.prev.err", mongo, db)
 }
 
@@ -211,12 +196,7 @@ mongo.get.prev.err <- function(mongo, db){
 #' }
 #' 
 #' @export mongo.reset.err
-mongo.reset.err <- function(mongo, db){
-  
-  #check for mongodb connection
-  if( !mongo.is.connected(mongo))
-    stop("No mongoDB connection!")
-  
+mongo.reset.err <- function(mongo, db){  
   .Call(".mongo.reset.err", mongo, db)
 }
 
@@ -259,11 +239,6 @@ mongo.reset.err <- function(mongo, db){
 #' 
 #' @export mongo.get.server.err
 mongo.get.server.err <- function(mongo){
-  
-  #check for mongodb connection
-  if( !mongo.is.connected(mongo))
-    stop("No mongoDB connection!")
-  
   .Call(".mongo.get.server.err", mongo)
 }
 
@@ -306,10 +281,5 @@ mongo.get.server.err <- function(mongo){
 #' 
 #' @export mongo.get.server.err.string
 mongo.get.server.err.string <- function(mongo){
-  
-  #check for mongodb connection
-  if( !mongo.is.connected(mongo))
-    stop("No mongoDB connection!")
-  
   .Call(".mongo.get.server.err.string", mongo)
 }
