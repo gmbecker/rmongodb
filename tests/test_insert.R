@@ -63,6 +63,6 @@ if( mongo.is.connected(mongo) ){
 }
 
 # cleanup and close
-mongo.drop(mongo, ns)
+mongo.drop.database(mongo, db)
 mongo.disconnect(mongo)
 mongo.destroy(mongo)
