@@ -179,9 +179,11 @@ SEXP mongo_undefined_create() {
 
 
 SEXP mongo_bson_empty() {
-    bson b;
-    bson_empty(&b);
-    SEXP ret = _mongo_bson_create(&b);
+    bson * b = bson_alloc();
+    bson_init_empty( b );
+    //bson b;
+    //bson_empty(&b);
+    SEXP ret = _mongo_bson_create(b);
     UNPROTECT(3);
     return ret;
 }
@@ -190,7 +192,7 @@ SEXP mongo_bson_empty() {
 SEXP mongo_bson_clear(SEXP b) {
     bson* _b = _checkBSON(b);
     bson_destroy(_b);
-    bson_empty(_b);
+    //bson_empty(_b);
     return b;
 }
 
