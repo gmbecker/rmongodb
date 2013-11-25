@@ -16,7 +16,11 @@
 
   Alternately, \code{query} may be a list which will be
   converted to a mongo.bson object by
-  \code{\link{mongo.bson.from.list}()}.}
+  \code{\link{mongo.bson.from.list}()}.
+
+  Alternately, \code{query} may be a valid JSON character
+  string which will be converted to a mongo.bson object by
+  \code{\link{mongo.bson.from.JSON}()}.}
 }
 \value{
   (double) The number of matching records.

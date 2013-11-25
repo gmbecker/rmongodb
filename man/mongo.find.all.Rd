@@ -21,7 +21,11 @@
 
   Alternately, \code{query} may be a list which will be
   converted to a mongo.bson object by
-  \code{\link{mongo.bson.from.list}()}.}
+  \code{\link{mongo.bson.from.list}()}.
+
+  Alternately, \code{query} may be a valid JSON character
+  string which will be converted to a mongo.bson object by
+  \code{\link{mongo.bson.from.JSON}()}.}
 
   \item{sort}{(\link{mongo.bson}) The desired fields by
   which to sort the returned records. The default of
@@ -31,7 +35,11 @@
 
   Alternately, \code{sort} may be a list which will be
   converted to a mongo.bson object by
-  \code{\link{mongo.bson.from.list}()}.}
+  \code{\link{mongo.bson.from.list}()}.
+
+  Alternately, \code{sort} may be a valid JSON character
+  string which will be converted to a mongo.bson object by
+  \code{\link{mongo.bson.from.JSON}()}.}
 
   \item{fields}{(\link{mongo.bson}) The desired fields
   which are to be returned from the matching record.  The
@@ -42,7 +50,11 @@
 
   Alternately, \code{fields} may be a list which will be
   converted to a mongo.bson object by
-  \code{\link{mongo.bson.from.list}()}.}
+  \code{\link{mongo.bson.from.list}()}.
+
+  Alternately, \code{fields} may be a valid JSON character
+  string which will be converted to a mongo.bson object by
+  \code{\link{mongo.bson.from.JSON}()}.}
 
   \item{limit}{(as.integer) The maximum number of records
   to be returned. A limit of 0L will return all matching

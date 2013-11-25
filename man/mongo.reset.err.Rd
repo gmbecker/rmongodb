@@ -25,9 +25,9 @@ if (mongo.is.connected(mongo)) {
 
     # try adding a duplicate record when index doesn't allow this
 
-    db <- "test"
-    ns <- "test.people"
-    mongo.index.create(mongo, ns, "name", mongo.index.unique)
+    db <- "rmongodb"
+    ns <- "rmongodb.people"
+    mongo.index.create(mongo, ns, '{"name":1}', options=mongo.index.unique)
 
     buf <- mongo.bson.buffer.create()
     mongo.bson.buffer.append(buf, "name", "John")

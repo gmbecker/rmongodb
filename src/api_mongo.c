@@ -337,7 +337,12 @@ SEXP rmongo_cursor_destroy(SEXP cursor) {
 SEXP mongo_index_create(SEXP mongo_conn, SEXP ns, SEXP key, SEXP name, SEXP expireAfterSeconds, SEXP options) {
     mongo* conn = _checkMongo(mongo_conn);
     const char* _ns = CHAR(STRING_ELT(ns, 0));
-    const char* _name = CHAR(STRING_ELT(name, 0));
+    const char* _name;
+    if (name == R_NilValue)
+        _name = NULL;
+    else
+        _name = CHAR(STRING_ELT(name, 0));
+    
     int _ttl = INTEGER(expireAfterSeconds)[0];
     int _options = 0;
     int i;

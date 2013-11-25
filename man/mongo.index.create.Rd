@@ -2,8 +2,8 @@
 \alias{mongo.index.create}
 \title{Add an index to a collection}
 \usage{
-  mongo.index.create(mongo, ns, key, name,
-    expireAfterSeconds = 0, options = 0L)
+  mongo.index.create(mongo, ns, key, name = NULL,
+    expireAfterSeconds = -1L, options = 0L)
 }
 \arguments{
   \item{mongo}{(\link{mongo}) A mongo connection object.}
@@ -23,7 +23,8 @@
 
   \item{name}{(string) The name of the index.}
 
-  \item{ttl}{(int) the expiration time in seconds.}
+  \item{expireAfterSeconds}{(int) the expiration time in
+  seconds.}
 
   \item{options}{(integer vector) Optional flags governing
   the operation: \itemize{

@@ -47,13 +47,24 @@ if( mongo.is.connected(mongo) ){
     "Dwight")
   
   
+  # insert data with JSON
+  mongo.insert(mongo, ns, '{"name":"Peter", "city":{"name":"Rom", "code": 31321}, "age":25}')
+  checkEquals(mongo.count(mongo, ns), 4)
+  checkEquals( 
+    mongo.bson.value(mongo.find.one(mongo, ns, query=list("name"="Peter")), "name"),
+    "Peter")
+  checkEquals( 
+    mongo.bson.value(mongo.find.one(mongo, ns, query=list("name"="Peter")), "city.name"),
+    "Rom")
+  
+  
   # insert batch
   buf <- mongo.bson.buffer.create()
   mongo.bson.buffer.append(buf, "name", "Silvia")
   mongo.bson.buffer.append(buf, "city", "Cincinnati")
   a <- mongo.bson.from.buffer(buf)
   mongo.insert.batch(mongo, ns, list(x, y, z, a))
-  checkEquals(mongo.count(mongo, ns), 7)
+  checkEquals(mongo.count(mongo, ns), 8)
   
   
   # create index
@@ -62,5 +73,7 @@ if( mongo.is.connected(mongo) ){
   # -> more index checks in test_indices
 }
 
+# cleanup and close
+mongo.drop.database(mongo, db)
 mongo.disconnect(mongo)
 mongo.destroy(mongo)

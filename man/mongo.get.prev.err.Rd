@@ -36,7 +36,7 @@ if (mongo.is.connected(mongo)) {
 
     db <- "test"
     ns <- "test.people"
-    mongo.index.create(mongo, ns, "name", mongo.index.unique)
+    mongo.index.create(mongo, ns, '{"name":1}', options=mongo.index.unique)
 
     buf <- mongo.bson.buffer.create()
     mongo.bson.buffer.append(buf, "name", "John")

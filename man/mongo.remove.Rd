@@ -17,7 +17,11 @@
 
   Alternately, \code{criteria} may be a list which will be
   converted to a mongo.bson object by
-  \code{\link{mongo.bson.from.list}()}.}
+  \code{\link{mongo.bson.from.list}()}.
+
+  Alternately, \code{criteria} may be a valid JSON
+  character string which will be converted to a mongo.bson
+  object by \code{\link{mongo.bson.from.JSON}()}.}
 }
 \description{
   Remove all records from a collection that match a given
