@@ -148,7 +148,7 @@ SEXP mongo_gridfile_writer_create(SEXP gfs, SEXP remotename, SEXP contenttype) {
     PROTECT(cls = allocVector(STRSXP, 1));
     SET_STRING_ELT(cls, 0, mkChar("mongo.gridfile.writer"));
     classgets(ret, cls);
-    gridfile_writer_init(gfile, _gfs, _remotename, _contenttype, 0);
+    gridfile_writer_init(gfile, _gfs, _remotename, _contenttype, 1);
     UNPROTECT(3);
     return ret;
 }

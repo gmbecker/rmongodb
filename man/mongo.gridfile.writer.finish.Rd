@@ -19,10 +19,10 @@ mongo <- mongo.create()
 if (mongo.is.connected(mongo)) {
     gridfs <- mongo.gridfs.create(mongo, "grid")
 
-    #gfw <- mongo.gridfile.writer.create(gridfs, "test.dat")
+    gfw <- mongo.gridfile.writer.create(gridfs, "test.dat")
 
     # store 4 bytes
-    #mongo.gridfile.writer.write(gfw, charToRaw("test"))
+    mongo.gridfile.writer.write(gfw, charToRaw("test"))
 
     # store string & LF plus 0-byte terminator
     #buf <- writeBin("Test\\n", as.raw(1))

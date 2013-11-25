@@ -282,7 +282,7 @@ mongo.gridfile.writer.write <- function(gfw, raw)
 #' if (mongo.is.connected(mongo)) {
 #'     gridfs <- mongo.gridfs.create(mongo, "grid")
 #' 
-#'     #gfw <- mongo.gridfile.writer.create(gridfs, "test.dat")
+#'     gfw <- mongo.gridfile.writer.create(gridfs, "test.dat")
 #' 
 #'     # store 4 bytes
 #'     #mongo.gridfile.writer.write(gfw, charToRaw("test"))
