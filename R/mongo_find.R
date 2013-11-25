@@ -30,6 +30,7 @@
 #' 
 #' Alternately, \code{fields} may be a valid JSON character string which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
+#' 
 #' @return NULL if no record matching the criteria is found; otherwise,
 #' 
 #' (\link{mongo.bson}) The matching record/fields.
@@ -37,11 +38,12 @@
 #' Note that NULL may also be returned if a database error occurred (when a
 #' badly formed query is used, for example). \code{\link{mongo.get.server.err}}
 #' and \code{\link{mongo.get.server.err.string}} may be examined in that case.
+#' 
 #' @seealso \code{\link{mongo.find}},\cr \code{\link{mongo.index.create}},\cr
 #' \code{\link{mongo.insert}},\cr \code{\link{mongo.update}},\cr
 #' \code{\link{mongo.remove}},\cr \link{mongo},\cr \link{mongo.bson}.
-#' @examples
 #' 
+#' @examples
 #' mongo <- mongo.create()
 #' if (mongo.is.connected(mongo)) {
 #'     buf <- mongo.bson.buffer.create()
@@ -74,6 +76,8 @@
 #' }
 #' 
 #' @export mongo.find.one
+#' 
+#' @aliases mongo.findOne
 mongo.find.one <- function(mongo, ns, query=mongo.bson.empty(), fields=mongo.bson.empty()) {
   
   #check for mongodb connection
@@ -92,6 +96,8 @@ mongo.find.one <- function(mongo, ns, query=mongo.bson.empty(), fields=mongo.bso
   
   .Call(".mongo.find.one", mongo, ns, query, fields)
 }
+
+mongo.findOne <- mongo.find.one
 
 
 
