@@ -48,5 +48,7 @@ if( mongo.is.connected(mongo) ){
   
 }
 
+# cleanup and close
+mongo.drop(mongo, ns)
 mongo.disconnect(mongo)
 mongo.destroy(mongo)

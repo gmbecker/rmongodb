@@ -62,5 +62,7 @@ if( mongo.is.connected(mongo) ){
   # -> more index checks in test_indices
 }
 
+# cleanup and close
+mongo.drop(mongo, ns)
 mongo.disconnect(mongo)
 mongo.destroy(mongo)
