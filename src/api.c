@@ -52,7 +52,7 @@ static const R_CallMethodDef callMethods[] = {
     { ".mongo.cursor.next", (DL_FUNC) rmongo_cursor_next, 1 },
     { ".mongo.cursor.value", (DL_FUNC) mongo_cursor_value, 1 },
     { ".mongo.cursor.destroy", (DL_FUNC) rmongo_cursor_destroy, 1 },
-    { ".mongo.index.create", (DL_FUNC) mongo_index_create, 4 },
+    { ".mongo.index.create", (DL_FUNC) mongo_index_create, 6 },
     { ".mongo.count", (DL_FUNC) rmongo_count, 3 },
     { ".mongo.command", (DL_FUNC) mongo_command, 3 },
     { ".mongo.simple.command", (DL_FUNC) mongo_simple_command, 4 },

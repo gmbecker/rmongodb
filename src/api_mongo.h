@@ -39,7 +39,7 @@ SEXP rmongo_find(SEXP mongo_conn, SEXP ns, SEXP query, SEXP sort, SEXP fields, S
 SEXP rmongo_cursor_next(SEXP cursor);
 SEXP mongo_cursor_value(SEXP cursor);
 SEXP rmongo_cursor_destroy(SEXP cursor);
-SEXP mongo_index_create(SEXP mongo_conn, SEXP ns, SEXP key, SEXP options);
+SEXP mongo_index_create(SEXP mongo_conn, SEXP ns, SEXP key, SEXP name, SEXP expireAfterSeconds, SEXP options);
 SEXP rmongo_count(SEXP mongo_conn, SEXP ns, SEXP query);
 SEXP mongo_command(SEXP mongo_conn, SEXP db, SEXP command);
 SEXP mongo_simple_command(SEXP mongo_conn, SEXP db, SEXP cmdstr, SEXP arg);

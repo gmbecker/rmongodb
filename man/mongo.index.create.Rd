@@ -2,7 +2,8 @@
 \alias{mongo.index.create}
 \title{Add an index to a collection}
 \usage{
-  mongo.index.create(mongo, ns, key, options = 0L)
+  mongo.index.create(mongo, ns, key, name,
+    expireAfterSeconds = 0, options = 0L)
 }
 \arguments{
   \item{mongo}{(\link{mongo}) A mongo connection object.}
@@ -19,6 +20,10 @@
   Alternately, \code{key} may be a list which will be
   converted to a mongo.bson object by
   \code{\link{mongo.bson.from.list}()}.}
+
+  \item{name}{(string) The name of the index.}
+
+  \item{ttl}{(int) the expiration time in seconds.}
 
   \item{options}{(integer vector) Optional flags governing
   the operation: \itemize{

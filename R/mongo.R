@@ -1524,6 +1524,8 @@ mongo.index.sparse     <- 16L
 #' 
 #' Alternately, \code{key} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' @param name (string) The name of the index.
+#' @param ttl (int) the expiration time in seconds.
 #' @param options (integer vector) Optional flags governing the operation:
 #' \itemize{ \item\code{\link{mongo.index.unique}}
 #' \item\code{\link{mongo.index.drop.dups}}
@@ -1564,10 +1566,10 @@ mongo.index.sparse     <- 16L
 #' }
 #' 
 #' @export mongo.index.create
-mongo.index.create <- function(mongo, ns, key, options=0L) {
+mongo.index.create <- function(mongo, ns, key, name, expireAfterSeconds=0, options=0L) {
     if (typeof(key) == "list")
         key <- mongo.bson.from.list(key)
-    .Call(".mongo.index.create", mongo, ns, key, options)
+    .Call(".mongo.index.create", mongo, ns, key, name, expireAfterSeconds, options)
 }
 
 

@@ -334,9 +334,11 @@ SEXP rmongo_cursor_destroy(SEXP cursor) {
 }
 
 
-SEXP mongo_index_create(SEXP mongo_conn, SEXP ns, SEXP key, SEXP options) {
+SEXP mongo_index_create(SEXP mongo_conn, SEXP ns, SEXP key, SEXP name, SEXP expireAfterSeconds, SEXP options) {
     mongo* conn = _checkMongo(mongo_conn);
     const char* _ns = CHAR(STRING_ELT(ns, 0));
+    const char* _name = CHAR(STRING_ELT(name, 0));
+    int _ttl = INTEGER(expireAfterSeconds)[0];
     int _options = 0;
     int i;
     int len = LENGTH(options);
@@ -356,7 +358,7 @@ SEXP mongo_index_create(SEXP mongo_conn, SEXP ns, SEXP key, SEXP options) {
         bson_finish(&b);
     }
     bson out;
-    int success = mongo_create_index(conn, _ns, _key, _options, &out);
+    int success = mongo_create_index(conn, _ns, _key, _name, _options, _ttl, &out);
     if (!keyIsBSON)
         bson_destroy(&b);
     if (success == MONGO_OK) {
@@ -644,8 +646,7 @@ SEXP mongo_get_database_collections(SEXP mongo_conn, SEXP db) {
     char ns[512];
     strcpy(ns, _db);
     strcpy(ns+len, ".system.namespaces");
-    bson empty;
-    bson_empty(&empty);
+     empty = bson_shared_empty();
     mongo_cursor* cursor = mongo_find(conn, ns, NULL, &empty, 0, 0, 0);
     int count = 0;
     while (cursor && mongo_cursor_next(cursor) == MONGO_OK) {
