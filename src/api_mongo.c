@@ -646,7 +646,8 @@ SEXP mongo_get_database_collections(SEXP mongo_conn, SEXP db) {
     char ns[512];
     strcpy(ns, _db);
     strcpy(ns+len, ".system.namespaces");
-     empty = bson_shared_empty();
+    bson empty;
+  bson_shared_empty();
     mongo_cursor* cursor = mongo_find(conn, ns, NULL, &empty, 0, 0, 0);
     int count = 0;
     while (cursor && mongo_cursor_next(cursor) == MONGO_OK) {
