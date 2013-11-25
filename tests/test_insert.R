@@ -47,6 +47,17 @@ if( mongo.is.connected(mongo) ){
     "Dwight")
   
   
+  # insert data with JSON
+  mongo.insert(mongo, ns, '{"name":"Peter", "city":{"name":"Rom", "code": 31321}, "age":25}')
+  checkEquals(mongo.count(mongo, ns), 4)
+  checkEquals( 
+    mongo.bson.value(mongo.find.one(mongo, ns, query=list("name"="Peter")), "name"),
+    "Peter")
+  checkEquals( 
+    mongo.bson.value(mongo.find.one(mongo, ns, query=list("name"="Peter")), "city.name"),
+    "Rom")
+  
+  
   # insert batch
   buf <- mongo.bson.buffer.create()
   mongo.bson.buffer.append(buf, "name", "Silvia")

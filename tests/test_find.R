@@ -85,8 +85,8 @@ if( mongo.is.connected(mongo) ){
   while (mongo.cursor.next(cursor))
     res <- rbind(res, mongo.bson.to.list(mongo.cursor.value(cursor)))
   mongo.cursor.destroy(cursor)  
-  checkEquals( class(res), "list")
-  checkEquals( dim(res), c(3,4))
+  checkEquals( class(res), "matrix")
+  checkEquals( dim(res), c(4,4))
   checkIdentical( sort(unlist(res[, "city"])) , unlist(res[, "city"]))
   
   # good query with find and sort and JSON
