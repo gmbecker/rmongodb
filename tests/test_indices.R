@@ -26,7 +26,7 @@ if( mongo.is.connected(mongo) ){
   for( i in 1:10){
     mongo.insert(mongo, ns, mongo.bson.from.JSON(paste('{"a":',i,', "b":"', letters[i],'"}', sep="")))
   }
-  out <- mongo.index.create(mongo, ns, "a", mongo.index.unique)
+  out <- mongo.index.create(mongo, ns, "a", options=mongo.index.unique)
   checkTrue( is.null(out) )
   insert <- mongo.insert(mongo, ns, mongo.bson.from.JSON('{"a":5}'))
   checkTrue( !insert )

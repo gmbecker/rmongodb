@@ -1,4 +1,3 @@
-
 #' Create a mongo.gridfs object
 #' 
 #' Create a \link{mongo.gridfs} object used to access and store "grid files" on
@@ -194,20 +193,20 @@ mongo.gridfs.store <- function(gridfs, raw, remotename, contenttype="")
 #' if (mongo.is.connected(mongo)) {
 #'     gridfs <- mongo.gridfs.create(mongo, "grid")
 #' 
-#'     gfw <- mongo.gridfile.writer.create(gridfs, "test.dat")
+#'     #gfw <- mongo.gridfile.writer.create(gridfs, "test.dat")
 #' 
 #'     # store 4 bytes
-#'     mongo.gridfile.writer.write(gfw, charToRaw("test"))
+#'     #mongo.gridfile.writer.write(gfw, charToRaw("test"))
 #' 
 #'     # store string & LF plus 0-byte terminator
-#'     buf <- writeBin("Test\n", as.raw(1))
-#'     mongo.gridfile.writer.write(gfw, buf)
+#'     #buf <- writeBin("Test\n", as.raw(1))
+#'     #mongo.gridfile.writer.write(gfw, buf)
 #' 
 #'     # store PI as a float
-#'     buf <- writeBin(3.1415926, as.raw(1), size=4, endian="little")
-#'     mongo.gridfile.writer.write(gfw, buf)
+#'     #buf <- writeBin(3.1415926, as.raw(1), size=4, endian="little")
+#'     #mongo.gridfile.writer.write(gfw, buf)
 #' 
-#'     mongo.gridfile.writer.finish(gfw)
+#'     #mongo.gridfile.writer.finish(gfw)
 #'     mongo.gridfs.destroy(gridfs)
 #' }
 #' 
@@ -242,20 +241,20 @@ mongo.gridfile.writer.create <- function(gridfs, remotename, contenttype="")
 #' if (mongo.is.connected(mongo)) {
 #'     gridfs <- mongo.gridfs.create(mongo, "grid")
 #' 
-#'     gfw <- mongo.gridfile.writer.create(gridfs, "test.dat")
+#'     #gfw <- mongo.gridfile.writer.create(gridfs, "test.dat")
 #' 
 #'     # store 4 bytes
-#'     mongo.gridfile.writer.write(gfw, charToRaw("test"))
+#'     #mongo.gridfile.writer.write(gfw, charToRaw("test"))
 #' 
 #'     # store string & LF plus 0-byte terminator
-#'     buf <- writeBin("Test\n", as.raw(1))
-#'     mongo.gridfile.writer.write(gfw, buf)
+#'     #buf <- writeBin("Test\n", as.raw(1))
+#'     #mongo.gridfile.writer.write(gfw, buf)
 #' 
 #'     # store PI as a float
-#'     buf <- writeBin(3.1415926, as.raw(1), size=4, endian="little")
-#'     mongo.gridfile.writer.write(gfw, buf)
+#'     #buf <- writeBin(3.1415926, as.raw(1), size=4, endian="little")
+#'     #mongo.gridfile.writer.write(gfw, buf)
 #' 
-#'     mongo.gridfile.writer.finish(gfw)
+#'     #mongo.gridfile.writer.finish(gfw)
 #' 
 #'     mongo.gridfs.destroy(gridfs)
 #' }
@@ -283,20 +282,20 @@ mongo.gridfile.writer.write <- function(gfw, raw)
 #' if (mongo.is.connected(mongo)) {
 #'     gridfs <- mongo.gridfs.create(mongo, "grid")
 #' 
-#'     gfw <- mongo.gridfile.writer.create(gridfs, "test.dat")
+#'     #gfw <- mongo.gridfile.writer.create(gridfs, "test.dat")
 #' 
 #'     # store 4 bytes
-#'     mongo.gridfile.writer.write(gfw, charToRaw("test"))
+#'     #mongo.gridfile.writer.write(gfw, charToRaw("test"))
 #' 
 #'     # store string & LF plus 0-byte terminator
-#'     buf <- writeBin("Test\n", as.raw(1))
-#'     mongo.gridfile.writer.write(gfw, buf)
+#'     #buf <- writeBin("Test\n", as.raw(1))
+#'     #mongo.gridfile.writer.write(gfw, buf)
 #' 
 #'     # store PI as a float
-#'     buf <- writeBin(3.1415926, as.raw(1), size=4, endian="little")
-#'     mongo.gridfile.writer.write(gfw, buf)
+#'     #buf <- writeBin(3.1415926, as.raw(1), size=4, endian="little")
+#'     #mongo.gridfile.writer.write(gfw, buf)
 #' 
-#'     mongo.gridfile.writer.finish(gfw)
+#'     #mongo.gridfile.writer.finish(gfw)
 #'     mongo.gridfs.destroy(gridfs)
 #' }
 #' 

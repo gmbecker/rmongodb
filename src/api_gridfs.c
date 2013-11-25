@@ -17,6 +17,8 @@
 #include "symbols.h"
 #include "utility.h"
 
+#define GRIDFILE_DEFAULT 0
+
 gridfs* _checkGridfs(SEXP gfs) {
     _checkClass(gfs, "mongo.gridfs");
     SEXP ptr = getAttrib(gfs, sym_mongo_gridfs);
@@ -146,7 +148,7 @@ SEXP mongo_gridfile_writer_create(SEXP gfs, SEXP remotename, SEXP contenttype) {
     PROTECT(cls = allocVector(STRSXP, 1));
     SET_STRING_ELT(cls, 0, mkChar("mongo.gridfile.writer"));
     classgets(ret, cls);
-    gridfile_writer_init(gfile, _gfs, _remotename, _contenttype, GRIDFILE_DEFAULT);
+    gridfile_writer_init(gfile, _gfs, _remotename, _contenttype, 0);
     UNPROTECT(3);
     return ret;
 }
