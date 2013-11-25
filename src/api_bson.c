@@ -362,7 +362,7 @@ int _mongo_bson_find(SEXP b, SEXP name, bson_iterator* iter) {
         if ((t = bson_find(iter, _b, prefix)) == BSON_EOO)
             return 0;
         if (t == BSON_ARRAY || t == BSON_OBJECT) {
-            bson_iterator_subobject(iter, &sub);
+            bson_iterator_subobject_init(iter, &sub, 0);
             _b = &sub;
             next = p + 1;
         }
@@ -670,7 +670,7 @@ SEXP _mongo_bson_value(bson_iterator* _iter) {
     case BSON_CODEWSCOPE: {
         const char* code = bson_iterator_code(_iter);
         bson b;
-        bson_iterator_code_scope(_iter, &b);
+        bson_iterator_code_scope_init(_iter, &b, 0);
         return _mongo_code_w_scope_create(code, &b);
     }
 
@@ -727,7 +727,7 @@ SEXP _mongo_bson_value(bson_iterator* _iter) {
         /* fall thru to returnSubObject */
 returnSubObject: {
             bson b;
-            bson_iterator_subobject(_iter, &b);
+            bson_iterator_subobject_init(_iter, &b, 0);
             return _mongo_bson_to_list(&b);
         }
 

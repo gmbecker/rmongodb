@@ -344,7 +344,7 @@ SEXP mongo_gridfile_read(SEXP gfile, SEXP size) {
     if (_size > remaining) _size = remaining;
     SEXP ret;
     PROTECT(ret = allocVector(RAWSXP, _size));
-    if (_size) gridfile_read(_gfile, _size, (char*)RAW(ret));
+    if (_size) gridfile_read_buffer(_gfile, (char*)RAW(ret), _size);
     UNPROTECT(1);
     return ret;
 }
