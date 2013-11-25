@@ -64,7 +64,7 @@ if( mongo.is.connected(mongo) ){
   mongo.bson.buffer.append(buf, "city", "Cincinnati")
   a <- mongo.bson.from.buffer(buf)
   mongo.insert.batch(mongo, ns, list(x, y, z, a))
-  checkEquals(mongo.count(mongo, ns), 7)
+  checkEquals(mongo.count(mongo, ns), 8)
   
   
   # create index
