@@ -1,5 +1,6 @@
 \name{mongo.find.one}
 \alias{mongo.find.one}
+\alias{mongo.findOne}
 \title{Find one record in a collection}
 \usage{
   mongo.find.one(mongo, ns, query = mongo.bson.empty(),

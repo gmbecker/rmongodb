@@ -76,6 +76,7 @@
 #' }
 #' 
 #' @export mongo.find.one
+#' @export mongo.findOne
 #' 
 #' @aliases mongo.findOne
 mongo.find.one <- function(mongo, ns, query=mongo.bson.empty(), fields=mongo.bson.empty()) {
