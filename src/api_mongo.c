@@ -646,9 +646,7 @@ SEXP mongo_get_database_collections(SEXP mongo_conn, SEXP db) {
     char ns[512];
     strcpy(ns, _db);
     strcpy(ns+len, ".system.namespaces");
-    bson empty;
-  bson_shared_empty();
-    mongo_cursor* cursor = mongo_find(conn, ns, NULL, &empty, 0, 0, 0);
+    mongo_cursor* cursor = mongo_find(conn, ns, NULL, bson_shared_empty(), 0, 0, 0);
     int count = 0;
     while (cursor && mongo_cursor_next(cursor) == MONGO_OK) {
         bson_iterator iter;
@@ -660,7 +658,7 @@ SEXP mongo_get_database_collections(SEXP mongo_conn, SEXP db) {
         }
     }
     mongo_cursor_destroy(cursor);
-    cursor = mongo_find(conn, ns, &empty, &empty, 0, 0, 0);
+    cursor = mongo_find(conn, ns, bson_shared_empty(), bson_shared_empty(), 0, 0, 0);
     SEXP ret;
     PROTECT(ret = allocVector(STRSXP, count));
     int i = 0;
