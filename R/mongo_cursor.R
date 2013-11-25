@@ -31,8 +31,8 @@
 mongo.cursor.to.list <- function(cursor, nullToNA = TRUE){
   
   warning("This fails for most NoSQL data structures. I am working on a new solution")
-  res <- list()
   
+  res <- list()
   while ( mongo.cursor.next(cursor) ){
     val <- mongo.bson.to.list(mongo.cursor.value(cursor))
     
@@ -85,25 +85,20 @@ mongo.cursor.to.data.frame <- function(cursor, nullToNA=TRUE, ...){
   
   warning("This fails for most NoSQL data structures. I am working on a new solution")
   
-  env <- new.env(parent=emptyenv(), hash=TRUE)
+  res <- data.frame()
   while ( mongo.cursor.next(cursor) ){
     val <- mongo.bson.to.list(mongo.cursor.value(cursor))
-    
-    print(val)
     
     if( nullToNA == TRUE )
       val[sapply(val, is.null)] <- NA
     
-    
-    id <- as.character(val[["_id"]])
-    print(id)
     # remove mongo.oid -> data.frame can not deal with that!
     val <- val[sapply(val, class) != 'mongo.oid']
-    
-    assign(id, val, envir=env)
+       
+    res <- rbind(res, as.data.frame(val, ... ))
     
   }
-  as.data.frame(as.list(env), ...)
+  as.data.frame(res)
 }
 
 
