@@ -3,30 +3,29 @@
 #' Retrieve an connection error code from a mongo object indicating the failure
 #' code if mongo.create() failed.
 #' 
-#' 
 #' @param mongo (\link{mongo}) a mongo connection object.
+#' 
 #' @return (integer) error code as follows:
-#' 
-#' mongo.create() errors:
-#' 
-#' Other errors:
-#' @returnItem 0 No Error
-#' @returnItem 1 No socket - Could not create socket.
-#' @returnItem 2 Fail - An error occurred attempting to connect to socket
-#' @returnItem 3 Address fail - An error occured calling getaddrinfo().
-#' @returnItem 4 Not Master - Warning: connected to a non-master node
+#'  \itemize{
+#' \item 0 No Error
+#' \item 1 No socket - Could not create socket.
+#' \item 2 Fail - An error occurred attempting to connect to socket
+#' \item 3 Address fail - An error occured calling getaddrinfo().
+#' \item 4 Not Master - Warning: connected to a non-master node
 #' (read-only).
-#' @returnItem 5 Bad set name - given name doesn't match the replica set.
-#' @returnItem 6 No Primary - Cannot find primary in replica set - connection
+#' \item 5 Bad set name - given name doesn't match the replica set.
+#' \item 6 No Primary - Cannot find primary in replica set - connection
 #' closed.
-#' @returnItem 7 I/O error - An error occured reading or writing on the socket.
-#' @returnItem 8 Read size error - The response is not the expected length.
-#' @returnItem 9 Command failed - The command returned with 'ok' value of 0.
-#' @returnItem 10 BSON invalid - Not valid for the specified operation.
-#' @returnItem 11 BSON not finished - should not occur with R driver.
-#' @seealso \code{\link{mongo.create}},\cr \link{mongo}
-#' @examples
+#' \item 7 I/O error - An error occured reading or writing on the socket.
+#' \item 8 Read size error - The response is not the expected length.
+#' \item 9 Command failed - The command returned with 'ok' value of 0.
+#' \item 10 BSON invalid - Not valid for the specified operation.
+#' \item 11 BSON not finished - should not occur with R driver.
+#' }
 #' 
+#' @seealso \code{\link{mongo.create}},\cr \link{mongo}
+#' 
+#' @examples
 #' mongo <- mongo.create()
 #' if (!mongo.is.connected(mongo)) {
 #'     print("Unable to connect.  Error code:")
