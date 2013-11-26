@@ -4,14 +4,15 @@ library(RUnit)
 # 7 tests
 # 22.11.2013
 
+# set up mongoDB connection and db / collection parameters
 mongo <- mongo.create()
-
-# empty test db
 db <- "rmongodb"
 ns <- paste(db, "test_insert", sep=".")
-mongo.drop(mongo, ns)
 
 if( mongo.is.connected(mongo) ){
+  
+  # clean up old existing collection
+  mongo.drop(mongo, ns)
  
   # insert data
   buf <- mongo.bson.buffer.create()
@@ -71,9 +72,8 @@ if( mongo.is.connected(mongo) ){
   mongo.index.create(mongo, ns, "city")
   mongo.index.create(mongo, ns, c("name", "city"))
   # -> more index checks in test_indices
-}
 
-# cleanup and close
-mongo.drop.database(mongo, db)
-mongo.disconnect(mongo)
-mongo.destroy(mongo)
+  # cleanup db and close connection
+  mongo.drop.database(mongo, db)
+  mongo.destroy(mongo)
+}
