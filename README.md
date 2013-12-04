@@ -59,6 +59,9 @@ MongoDB server
 
 
 ### Good ressources to Get Started with rmongodb
+* *Basic Overview of using the rmongodb package for R* - December 2013, Brock Tibert
+  * code examples: https://gist.github.com/Btibert3/7751989
+
 * *R with MongoDB* - MongoDB Munich conference, October 2013, Markus Schmidberger
   * video: http://www.youtube.com/watch?v=RR3UxemmJ1Q
   * slides: http://rpubs.com/schmidb/rstatsMongoDB
