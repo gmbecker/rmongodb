@@ -5,7 +5,7 @@ This is an R (www.r-project.org) extension supporting access to MongoDB (www.mon
 
 The latest stable version is available on **CRAN**: http://cran.r-project.org/package=rmongodb
 
-Thanks to Gerald Lindsly and MongoDB, Inc. (formerly 10gen) for all the initial work. 
+Thanks to Gerald Lindsly and MongoDB, Inc. (formerly 10gen) for the initial work. 
 In October 2013, **MongoSoup** (www.mongosoup.de) has overtaken the development and maintenance of the R package. 
 
 Please feel free to send us issues or pull requests via github: https://github.com/mongosoup/rmongodb
