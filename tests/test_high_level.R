@@ -1,7 +1,7 @@
 library(rmongodb)
 library(RUnit)
 
-#  tests
+# 2 tests
 # 13.12.2013
 
 # set up mongoDB connection and db / collection parameters
