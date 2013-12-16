@@ -1,7 +1,10 @@
 rmongodb NEWS
 ========================================================
 
-Decemnber 13, 2013
+December 16, 2013
+* RUnit test bugfix for errors in test_find
+
+December 13, 2013
 * mongo.distict is back to package including tests
 
 November 25, 2013
