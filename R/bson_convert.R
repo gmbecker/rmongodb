@@ -116,7 +116,7 @@ mongo.bson.from.JSON <- function(JSON, simplifyVector=FALSE, ...){
 #' 
 #' @export mongo.bson.to.list
 mongo.bson.to.list <- function(b)
-  .Call(".mongo.bson.to.list", b)
+  as.list( .Call(".mongo.bson.to.list", b) )
 
 
 
