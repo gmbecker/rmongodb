@@ -19,3 +19,6 @@ src/*.rds
 .Rhistory
 .DS_Store
 README.html
+vignettes/figure/*
+vignettes/*.html
+vignettes/*.md
