@@ -4,14 +4,15 @@ library(RUnit)
 # 10 tests
 # 22.11.2013
 
+# set up mongoDB connection and db / collection parameters
 mongo <- mongo.create()
-
-# empty test db
 db <- "rmongodb"
 ns <- paste(db, "test_gridfs", sep=".")
-mongo.drop(mongo, ns)
 
 if( mongo.is.connected(mongo) ){
+  
+  # clean up old existing collection
+  mongo.drop(mongo, ns)
   
   gfs <- mongo.gridfs.create(mongo, db)
   checkEquals(class(gfs), "mongo.gridfs")
@@ -68,9 +69,7 @@ if( mongo.is.connected(mongo) ){
   
   mongo.gridfile.destroy(gridfile)
 
+  # cleanup db and close connection
+  mongo.drop.database(mongo, db)
+  mongo.destroy(mongo)
 }
-
-# cleanup and close
-mongo.drop.database(mongo, db)
-mongo.disconnect(mongo)
-mongo.destroy(mongo)

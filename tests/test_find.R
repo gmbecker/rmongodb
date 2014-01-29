@@ -1,17 +1,18 @@
 library(rmongodb)
 library(RUnit)
 
-# 17 tests
-# 25.11.2013
+# 19 tests
+# 16.12.2013
 
+# set up mongoDB connection and db / collection parameters
 mongo <- mongo.create()
-
-# empty test db
 db <- "rmongodb"
 ns <- paste(db, "test_find", sep=".")
-mongo.drop(mongo, ns)
 
 if( mongo.is.connected(mongo) ){
+  
+  # clean up old existing collection
+  mongo.drop(mongo, ns)
 
   # inster data
   buf <- mongo.bson.buffer.create()
@@ -47,9 +48,12 @@ if( mongo.is.connected(mongo) ){
   if (is.null(result)) {
     err <- mongo.get.server.err(mongo)
     print(err)
-    print(mongo.get.server.err.string(mongo))
+    err_str <- mongo.get.server.err.string(mongo)
+    print(err_str)
   } 
-  checkEqualsNumeric(err, 10068)
+  checkTrue( is.integer(err) )
+  checkTrue( is.character(err_str) )
+  checkTrue( grep("\\$bad", err_str) == 1 )
   
   
   # good query with find.one
@@ -106,9 +110,7 @@ if( mongo.is.connected(mongo) ){
   checkEquals( dim(res), c(4,4) )
   checkTrue( is.list(res) )
   
+  # cleanup db and close connection
+  mongo.drop.database(mongo, db)
+  mongo.destroy(mongo)
 }
-
-# cleanup and close
-mongo.drop.database(mongo, db)
-mongo.disconnect(mongo)
-mongo.destroy(mongo)

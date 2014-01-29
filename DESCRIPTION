@@ -1,14 +1,15 @@
 Package: rmongodb
 Type: Package
 Title: R-MongoDB driver
-Version: 1.2.5
-Date: 2013-11-25
-Depends: R (>= 2.10), RJSONIO
-Author: Gerald Lindsly & MongoDB, Inc. (mongo-c-driver) & Markus Schmidberger (mongosoup.de)
+Version: 1.4.1
+Date: 2014-01-29
+Depends: R (>= 2.10)
+Imports: jsonlite
+Author: MongoDB, Inc. (mongo-c-driver) & Markus Schmidberger (mongosoup.de). Formerly Gerald Lindsly.
 Maintainer: Markus Schmidberger <markus@mongosoup.de>
 Description: This R package provides an interface to the NoSQL MongoDB database using the MongoDB C-driver.
 License: Apache License 2.0
-URL: https://github.com/mongosoup/rmongodb
+URL: https://github.com/mongosoup/rmongodb, http://stackoverflow.com/questions/tagged/rmongodb
 BugReports: https://github.com/mongosoup/rmongodb/issues 
 SystemRequirements: MongoDB
 Suggests: RUnit

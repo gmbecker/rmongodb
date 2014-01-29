@@ -112,8 +112,8 @@ mongo.index.create <- function(mongo, ns, key,
   } else if ( class(key) == "list"){
     key <- mongo.bson.from.list(key)
   } else if ( class(key) == "character"){
-    if( isValidJSON(I(key)))
-      key <- mongo.bson.from.JSON(key)
+    if( validate(I(key)))
+        key <- mongo.bson.from.JSON(key)
     else
       key <- key
   }

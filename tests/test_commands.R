@@ -4,14 +4,15 @@ library(RUnit)
 # 18 tests
 # 22.11.2013
 
+# set up mongoDB connection and db / collection parameters
 mongo <- mongo.create()
-
-# empty test db
 db <- "rmongodb"
 ns <- paste(db, "test_commands", sep=".")
-mongo.drop(mongo, ns)
 
 if( mongo.is.connected(mongo) ){
+  
+  # clean up old existing collection
+  mongo.drop(mongo, ns)
   
   print(mongo.get.primary(mongo))
   test <- mongo.is.master(mongo)
@@ -90,10 +91,8 @@ if( mongo.is.connected(mongo) ){
   mongo.insert(mongo, "rmongodb.test_new2", z)
   out <- mongo.get.database.collections(mongo, "rmongodb")
   checkEquals( length(out), 2)
-
+  
+  # cleanup db and close connection
+  mongo.drop.database(mongo, db)
+  mongo.destroy(mongo)
 }
-
-# cleanup and close
-mongo.drop.database(mongo, db)
-mongo.disconnect(mongo)
-mongo.destroy(mongo)
