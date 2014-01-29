@@ -1,5 +1,8 @@
 rmongodb NEWS
 ========================================================
+January 29, 2014
+* switching from RJSONIO to jsonlite - solves many issues converting JSON to R
+* moving RJSONIO / jsonlite to IMPORTS
 
 December 16, 2013
 * RUnit test bugfix for errors in test_find

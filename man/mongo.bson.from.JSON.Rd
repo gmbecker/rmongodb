@@ -2,10 +2,13 @@
 \alias{mongo.bson.from.JSON}
 \title{Convert JSON to BSON Object}
 \usage{
-mongo.bson.from.JSON(JSON, ...)
+mongo.bson.from.JSON(JSON, simplifyVector = FALSE, ...)
 }
 \arguments{
   \item{JSON}{(string) A valid JSON string.}
+
+  \item{simplifyVector}{(FALSE) coerse JSON arrays
+  containing only scalars into a vector.}
 
   \item{...}{additional parameters parsed to fromJSON}
 }

@@ -1,5 +1,5 @@
 #' @useDynLib rmongodb
-#' @import RJSONIO
+#' @import jsonlite
 #'
 .onUnload <- function(libpath)
     library.dynam.unload("rmongodb", libpath)

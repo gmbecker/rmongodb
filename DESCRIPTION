@@ -4,7 +4,7 @@ Title: R-MongoDB driver
 Version: 1.4.1
 Date: 2014-01-29
 Depends: R (>= 2.10)
-Imports: RJSONIO
+Imports: jsonlite
 Author: MongoDB, Inc. (mongo-c-driver) & Markus Schmidberger (mongosoup.de). Formerly Gerald Lindsly.
 Maintainer: Markus Schmidberger <markus@mongosoup.de>
 Description: This R package provides an interface to the NoSQL MongoDB database using the MongoDB C-driver.
