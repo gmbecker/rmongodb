@@ -1,7 +1,5 @@
-<!--
-%\VignetteEngine{knitr}
+%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Introduction to the rmongodb Package}
--->
 
 
 MongoDB (www.mongodb.org) is a scalable, high-performance, document-oriented NoSQL database. The **rmongodb** package provides an interface from R (www.r-project.org) to MongoDB and back using the mongodb-C library. 
@@ -138,9 +136,10 @@ mongo.index.create(mongo, icoll, '{"ident":1}')
 # check mongoshell!
 ```
 
-## Drop / Remove collections and Close Connection to MongoDB
+## Drop / Remove collections and databases and Close Connection to MongoDB
 ```{r}
 mongo.drop(mongo, icoll)
+mongo.drop.database(mongo, db)
 mongo.get.database.collections(mongo, db)
 
 # close connection
@@ -163,8 +162,8 @@ data(zips)
 head(zips)
 zips[1,]$loc
 
-res <- list(length(10))
-for(i in 1:10){
+res <- list(length(dim(zips)[1]))
+for(i in 1:dim(zips)[1]){
   tmp <- zips[i,] 
   res[[i]] <- mongo.bson.from.list(tmp)
 }
@@ -172,29 +171,30 @@ mongo.insert.batch(mongo, "rmongodb.zips", res )
 
 mongo.count(mongo, icoll)
 mongo.find.all(mongo, icoll)
-mongo.drop(mongo, icoll)
 ```
 
 
 ## MongoDB Aggregation Framework
 JSON to BSON not yet working for this secnario
 ```{r}
-buf <- mongo.bson.buffer.create();
-mongo.bson.buffer.start.object(buf, "$group");
-mongo.bson.buffer.append(buf, "_id", "$state"); 
-mongo.bson.buffer.start.object(buf, "totalPop");
-mongo.bson.buffer.append(buf, "$sum", "$pop"); 
-mongo.bson.buffer.finish.object(buf);
-mongo.bson.buffer.finish.object(buf);
-bson <- mongo.bson.from.buffer(buf);
+buf <- mongo.bson.buffer.create()
+mongo.bson.buffer.start.object(buf, "$group")
+mongo.bson.buffer.append(buf, "_id", "$state")
+mongo.bson.buffer.start.object(buf, "totalPop")
+mongo.bson.buffer.append(buf, "$sum", "$pop")
+mongo.bson.buffer.finish.object(buf)
+mongo.bson.buffer.finish.object(buf)
+bson <- mongo.bson.from.buffer(buf)
 
-bufall <- mongo.bson.buffer.create();
-mongo.bson.buffer.append(bufall, "aggregate", "zips"); 
-mongo.bson.buffer.start.array(bufall, "pipeline");
-mongo.bson.buffer.append(bufall, "0", bson);
-mongo.bson.buffer.finish.object(bufall);
-cmd <- mongo.bson.from.buffer(bufall);
+bufall <- mongo.bson.buffer.create()
+mongo.bson.buffer.append(bufall, "aggregate", "zips")
+mongo.bson.buffer.start.array(bufall, "pipeline")
+mongo.bson.buffer.append(bufall, "0", bson)
+mongo.bson.buffer.finish.object(bufall)
+cmd <- mongo.bson.from.buffer(bufall)
+cmd
 res <- mongo.command(mongo, db, cmd)
+res
 ```
 
 
@@ -202,7 +202,6 @@ res <- mongo.command(mongo, db, cmd)
 GridFS is a specification for storing and retrieving files 
 that exceed the BSON-document size limit of 16MB.
 ```{r}
-mongo.gridfs.create
 mgrids <- mongo.gridfs.create(mongo, db, prefix = "fs")
 mongo.gridfs.store.file(mgrids, "faust.txt", "Faust")
 gf <- mongo.gridfs.find(mgrids, "Faust")
@@ -212,6 +211,7 @@ mongo.gridfile.get.chunk.count(gf)
 
 
 # close connection
+mongo.drop.database(mongo, db)
 mongo.destroy(mongo)
 ```
 
