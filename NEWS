@@ -2,6 +2,10 @@ rmongodb NEWS
 ========================================================
 
 February 20, 2014
+* vignette improved and now independent of running MongoDB
+* second vignette with Advanced rmongodb Topics added
+
+February 20, 2014
 * new CRAN submission
 * now in default mongo.bson.to.list returns a list. This can be changed using the simplify=TRUE option
 * preparing src directory structure for new mongo and bson C libraries

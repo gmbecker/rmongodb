@@ -1,0 +1,119 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Advanced Topics in the rmongodb Package}
+
+Advanced Topics in the rmongodb Package
+========================================
+
+MongoDB (www.mongodb.org) is a scalable, high-performance, document-oriented NoSQL database. The **rmongodb** package provides an interface from the statistical software R (www.r-project.org) to MongoDB and back using the mongodb-C library. 
+
+
+This vignette will provide demos for advanced topics in the **rmongodb** package.
+
+
+
+# Connect R to MongoDB
+First of all we have to load the library and to connect to a MongoDB. In this case we connect to our local MongoDB installation.
+```{r connect}
+library(rmongodb)
+mongo <- mongo.create()
+mongo.is.connected(mongo)
+```
+
+
+
+
+# Insert Big Data
+We will use the "Zip Code Data Set" from MongoDB in the following examples. The data set is included in the **rmongodb** package and can be loaded using the command *data(zips)*. The 'zips' data set holds the MongoDB example data set called "Zip Code Data Set" (http://docs.mongodb.org/manual/tutorial/aggregation-zip-code-data-set/). This data set is available as JSON and hold zip code data from the US.
+```{r insertZips}
+# load example data set from rmongodb
+data(zips)
+head(zips)
+zips[1,]$loc
+  
+if(mongo.is.connected(mongo) == TRUE){
+  res <- list(length(dim(zips)[1]))
+  for(i in 1:dim(zips)[1]){
+    tmp <- zips[i,] 
+    res[[i]] <- mongo.bson.from.list(tmp)
+  }
+  mongo.insert.batch(mongo, "rmongodb.zips", res )
+}
+```
+Lets do a small check to test if all inserted data is available in MongoDB.
+```{r insertCheck}
+dim(zips)
+if(mongo.is.connected(mongo) == TRUE){
+  nr <- mongo.count(mongo, "rmongodb.zips")
+  print( nr )
+  res <- mongo.find.all(mongo, "rmongodb.zips")
+  head(res)
+}
+```
+
+
+
+# MongoDB Aggregation Framework
+MongoDB Aggregation Framework is one of the top MongoDB features. Aggregations operations process data records and return computed results. Aggregation operations group values from multiple documents together, and can perform a variety of operations on the grouped data to return a single result. 
+
+So far, JSON to BSON conversion is not yet working for aggregation requests in **rmongodb**. Therefore, we have to create these difficult BSON objects.
+```{r aggregationFrameworkBSON, results='hide'}
+buf <- mongo.bson.buffer.create()
+mongo.bson.buffer.start.object(buf, "$group")
+mongo.bson.buffer.append(buf, "_id", "$state")
+mongo.bson.buffer.start.object(buf, "totalPop")
+mongo.bson.buffer.append(buf, "$sum", "$pop")
+mongo.bson.buffer.finish.object(buf)
+mongo.bson.buffer.finish.object(buf)
+bson <- mongo.bson.from.buffer(buf)
+
+bufall <- mongo.bson.buffer.create()
+mongo.bson.buffer.append(bufall, "aggregate", "zips")
+mongo.bson.buffer.start.array(bufall, "pipeline")
+mongo.bson.buffer.append(bufall, "0", bson)
+mongo.bson.buffer.finish.object(bufall)
+cmd <- mongo.bson.from.buffer(bufall)
+```
+```{r aggregationFrameworkrun}
+cmd
+if(mongo.is.connected(mongo) == TRUE){
+  res <- mongo.command(mongo, "rmongodb", cmd)
+  res
+}
+```
+
+
+
+
+
+
+# GridFS with rmongodb
+GridFS is a specification for storing and retrieving files that exceed the BSON-document size limit of 16MB. There are several commands in **rmongodb** available to work with gridFS.
+```{r gridfs}
+if(mongo.is.connected(mongo) == TRUE){
+  mgrids <- mongo.gridfs.create(mongo, "rmongodb", prefix = "fs")
+  mongo.gridfs.store.file(mgrids, "faust.txt", "Faust")
+  gf <- mongo.gridfs.find(mgrids, "Faust")
+  mongo.gridfile.get.length(gf)
+  mongo.gridfile.get.chunk.count(gf)
+}
+```
+
+
+
+# Drop / Remove collections and databases and Close Connection to MongoDB
+At the end of all your analyses it is a good idea to destroy the connection to your MongoDB and to clean-up collections.
+```{r drop}
+if(mongo.is.connected(mongo) == TRUE){
+  mongo.drop(mongo, "rmongodb.zips")
+  mongo.drop.database(mongo, "rmongodb")
+  
+  # close connection
+  mongo.destroy(mongo)
+}
+```
+
+
+# Feedback and Issues
+Please do not hesitate to contact us if there are any issues using **rmongodb**. Issues or pull requests can be submitted via github: https://github.com/mongosoup/rmongodb
+
+
