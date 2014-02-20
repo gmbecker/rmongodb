@@ -1,81 +1,88 @@
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Introduction to the rmongodb Package}
 
+Introduction to the rmongodb Package
+========================================
 
-MongoDB (www.mongodb.org) is a scalable, high-performance, document-oriented NoSQL database. The **rmongodb** package provides an interface from R (www.r-project.org) to MongoDB and back using the mongodb-C library. 
+MongoDB (www.mongodb.org) is a scalable, high-performance, document-oriented NoSQL database. The **rmongodb** package provides an interface from the statistical software R (www.r-project.org) to MongoDB and back using the mongodb-C library. 
 
 # Installing and Loading rmongodb Package
-There is a stable CRAN version of rmongodb available:
-```{r, eval=FALSE}
+There is a stable CRAN version of **rmongodb** available:
+```{r installRmongodb, eval=FALSE}
 install.packages("rmongodb")
 ```
-You can also install the latest development version from github:
-```{r, eval=FALSE}
+
+You can also install the latest development version from the GitHub repository:
+```{r installDEV, eval=FALSE}
 library(devtools)
 install_github("rmongodb", "mongosoup")
 ```
-The installation should very simple. No local MongoDB installation is required. Only if you install from source the RUnit test will need a local MongoDB installation.
+The installation should be very simple and straightforward. No local MongoDB installation is required. Only if you install from source the RUnit tests will need a local MongoDB installation.
 
-Afterwards you can load rmongodb as any other package:
-```{r}
+Afterwards you can load the **rmongodb** package as any other package:
+```{r loadRmongodb}
 library(rmongodb)
 ```
+
+
 
 
 # First Steps in rmongodb Package
 
 ## Connect to MongoDB
-```{r}
+```{r connect2Mongo}
 mongo <- mongo.create()
 mongo
 mongo.is.connected(mongo)
 ```
 
-```{r, echo=FALSE}
-# load some data
-library(jsonlite)
-data(zips)
-res <- list(length(dim(zips)[1]))
-for(i in 1:dim(zips)[1]){
-  tmp <- zips[i,] 
-  res[[i]] <- mongo.bson.from.list(tmp)
+```{r importZIPdata, echo=FALSE, warning=FALSE, results='hide'}
+if(mongo.is.connected(mongo) == TRUE){
+  # load some data
+  library(jsonlite)
+  data(zips)
+  res <- list(length(dim(zips)[1]))
+  for(i in 1:dim(zips)[1]){
+    tmp <- zips[i,] 
+    res[[i]] <- mongo.bson.from.list(tmp)
+  }
+  mongo.insert.batch(mongo, "rmongodb.zips", res )
 }
-mongo.insert.batch(mongo, "rmongodb.zips", res )
 ```
 
-## Get Databases
-```{r}
-mongo.get.databases(mongo)
+## Get Databases and Collections
+```{r getDBsColls}
+if(mongo.is.connected(mongo) == TRUE){
+  mongo.get.databases(mongo)
+  
+  db <- "rmongodb"
+  coll <- "rmongodb.zips"
+  mongo.get.database.collections(mongo, db)
+}
 ```
 
-## Get Collections
-```{r}
-db <- "rmongodb"
-coll <- "rmongodb.zips"
-mongo.get.database.collections(mongo, db)
-```
+## Get Size of Collection and Values for a Key
+```{r countDistinct}
+if(mongo.is.connected(mongo) == TRUE){
+  mongo.count(mongo, coll)
 
-## Get Size of Collection
-```{r}
-mongo.count(mongo, coll)
-```
-
-## Get Values for a Key
-```{r}
-res <- mongo.distinct(mongo, coll, "city")
-head(res)
+  res <- mongo.distinct(mongo, coll, "city")
+  head(res)
+}
 ```
 
 ## Find some first data
-```{r}
-cityone <- mongo.find.one(mongo, coll, '{"city":"COLORADO CITY"}')
-cityone
-mongo.bson.to.list(cityone)
+```{r findOne}
+if(mongo.is.connected(mongo) == TRUE){
+  cityone <- mongo.find.one(mongo, coll, '{"city":"COLORADO CITY"}')
+  cityone
+  mongo.bson.to.list(cityone)
+}
 ```
 
 ## For a long time it was all about creating BSON objects
 Since rmongodb version 1.2 you can use JSON directly.
-```{r}
+```{r createBSON}
 buf <- mongo.bson.buffer.create()
 mongo.bson.buffer.append(buf, "city", "COLORADO CITY")
 query <- mongo.bson.from.buffer(buf)
@@ -84,66 +91,75 @@ mongo.bson.from.JSON('{"city":"COLORADO CITY"}')
 ```
 
 ## Find more data
-```{r}
-pop <- mongo.distinct(mongo, coll, "pop")
-hist(pop)
-boxplot(pop)
+```{r findMore}
+if(mongo.is.connected(mongo) == TRUE){
+  pop <- mongo.distinct(mongo, coll, "pop")
+  hist(pop)
+  boxplot(pop)
 
-mongo.count(mongo, coll, '{"pop":{"$lte":2}}')
-pops <- mongo.find.all(mongo, coll, '{"pop":{"$lte":2}}')
-head(pops)
-dim(pops)
+  mongo.count(mongo, coll, '{"pop":{"$lte":2}}')
+  pops <- mongo.find.all(mongo, coll, '{"pop":{"$lte":2}}')
+  head(pops)
+  dim(pops)
+}
 ```
 
 ## Find more data with more compley query
-```{r}
+```{r compleyQuery}
 library(jsonlite)
 json <- '{"pop":{"$lte":2}, "pop":{"$gte":1}}'
 cat(prettify(json))
 validate(json)
-mongo.count(mongo, coll, json)
-pops <- mongo.find.all(mongo, coll, json)
-head(pops)
-dim(pops)
+if(mongo.is.connected(mongo) == TRUE){
+  mongo.count(mongo, coll, json)
+  pops <- mongo.find.all(mongo, coll, json)
+  head(pops)
+  dim(pops)
+}
 
 # still inefficient!
 mongo.cursor.to.data.frame
 ```
 
 ## Insert some data to MongoDB
-```{r}
+```{r insert}
 # insert data
-icoll <- paste(db, "test", sep=".")
 a <- mongo.bson.from.JSON( '{"ident":"a", "name":"Markus", "age":33}' )
 b <- mongo.bson.from.JSON( '{"ident":"b", "name":"MongoSoup", "age":1}' )
 c <- mongo.bson.from.JSON( '{"ident":"c", "name":"UseR", "age":18}' )
-mongo.insert.batch(mongo, icoll, list(a,b,c) )
 
-mongo.get.database.collections(mongo, db)
-mongo.find.all(mongo, icoll)
+if(mongo.is.connected(mongo) == TRUE){
+  icoll <- paste(db, "test", sep=".")
+  mongo.insert.batch(mongo, icoll, list(a,b,c) )
+
+  mongo.get.database.collections(mongo, db)
+  mongo.find.all(mongo, icoll)
+}
 ```
 
-## Update documents in MongoDB
-```{r}
-mongo.update(mongo, icoll, '{"ident":"b"}', '{"$inc":{"age":3}}' )
+## Update documents in MongoDB and create indices for efficient queries
+```{r update}
+if(mongo.is.connected(mongo) == TRUE){
+  mongo.update(mongo, icoll, '{"ident":"b"}', '{"$inc":{"age":3}}' )
 
-mongo.find.all(mongo, icoll)
-```
-
-## Create indices for efficient queries
-```{r}
-mongo.index.create(mongo, icoll, '{"ident":1}')
-# check mongoshell!
+  mongo.find.all(mongo, icoll)
+  
+  # Creating an index for the field 'ident'
+  mongo.index.create(mongo, icoll, '{"ident":1}')
+  # check mongoshell!
+}
 ```
 
 ## Drop / Remove collections and databases and Close Connection to MongoDB
-```{r}
-mongo.drop(mongo, icoll)
-mongo.drop.database(mongo, db)
-mongo.get.database.collections(mongo, db)
+```{r dropColls}
+if(mongo.is.connected(mongo) == TRUE){
+  mongo.drop(mongo, icoll)
+  mongo.drop.database(mongo, db)
+  mongo.get.database.collections(mongo, db)
 
-# close connection
-mongo.destroy(mongo)
+  # close connection
+  mongo.destroy(mongo)
+}
 ```
 
 
@@ -152,31 +168,34 @@ mongo.destroy(mongo)
 
 # Advanced Steps in rmongodb Package
 
-```{r}
+```{r connect2}
 mongo <- mongo.create()
+mongo.is.connected(mongo)
 ```
 
 ## Insert Big Data
-```{r}
-data(zips)
-head(zips)
-zips[1,]$loc
-
-res <- list(length(dim(zips)[1]))
-for(i in 1:dim(zips)[1]){
-  tmp <- zips[i,] 
-  res[[i]] <- mongo.bson.from.list(tmp)
+```{r insertZips2}
+if(mongo.is.connected(mongo) == TRUE){
+  data(zips)
+  head(zips)
+  zips[1,]$loc
+  
+  res <- list(length(dim(zips)[1]))
+  for(i in 1:dim(zips)[1]){
+    tmp <- zips[i,] 
+    res[[i]] <- mongo.bson.from.list(tmp)
+  }
+  mongo.insert.batch(mongo, "rmongodb.zips", res )
+  
+  mongo.count(mongo, icoll)
+  mongo.find.all(mongo, icoll)
 }
-mongo.insert.batch(mongo, "rmongodb.zips", res )
-
-mongo.count(mongo, icoll)
-mongo.find.all(mongo, icoll)
 ```
 
 
 ## MongoDB Aggregation Framework
 JSON to BSON not yet working for this secnario
-```{r}
+```{r aggregationFramework}
 buf <- mongo.bson.buffer.create()
 mongo.bson.buffer.start.object(buf, "$group")
 mongo.bson.buffer.append(buf, "_id", "$state")
@@ -193,26 +212,30 @@ mongo.bson.buffer.append(bufall, "0", bson)
 mongo.bson.buffer.finish.object(bufall)
 cmd <- mongo.bson.from.buffer(bufall)
 cmd
-res <- mongo.command(mongo, db, cmd)
-res
+if(mongo.is.connected(mongo) == TRUE){
+  res <- mongo.command(mongo, db, cmd)
+  res
+}
 ```
 
 
 ## GridFS with rmongodb
 GridFS is a specification for storing and retrieving files 
 that exceed the BSON-document size limit of 16MB.
-```{r}
-mgrids <- mongo.gridfs.create(mongo, db, prefix = "fs")
-mongo.gridfs.store.file(mgrids, "faust.txt", "Faust")
-gf <- mongo.gridfs.find(mgrids, "Faust")
-mongo.gridfile.get.length(gf)
-mongo.gridfile.get.chunk.count(gf)
-
-
-
-# close connection
-mongo.drop.database(mongo, db)
-mongo.destroy(mongo)
+```{r gridfs}
+if(mongo.is.connected(mongo) == TRUE){
+  mgrids <- mongo.gridfs.create(mongo, db, prefix = "fs")
+  mongo.gridfs.store.file(mgrids, "faust.txt", "Faust")
+  gf <- mongo.gridfs.find(mgrids, "Faust")
+  mongo.gridfile.get.length(gf)
+  mongo.gridfile.get.chunk.count(gf)
+  
+  
+  
+  # close connection
+  mongo.drop.database(mongo, db)
+  mongo.destroy(mongo)
+}
 ```
 
 
