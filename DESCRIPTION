@@ -1,8 +1,8 @@
 Package: rmongodb
 Type: Package
 Title: R-MongoDB driver
-Version: 1.5.1
-Date: 2014-01-29
+Version: 1.5.2
+Date: 2014-02-20
 Depends:
     R (>= 2.10)
 Imports:
@@ -16,7 +16,7 @@ License: Apache License 2.0
 URL: https://github.com/mongosoup/rmongodb,
     http://stackoverflow.com/questions/tagged/rmongodb
 BugReports: https://github.com/mongosoup/rmongodb/issues
-SystemRequirements: MongoDB
+SystemRequirements: MongoDB, GNU make
 Suggests:
     RUnit,
     knitr
