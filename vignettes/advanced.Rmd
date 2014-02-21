@@ -1,7 +1,7 @@
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Advanced Topics in the rmongodb Package}
 
-Advanced Topics in the rmongodb Package
+Advanced topics in the rmongodb Package
 ========================================
 
 MongoDB (www.mongodb.org) is a scalable, high-performance, document-oriented NoSQL database. The **rmongodb** package provides an interface from the statistical software R (www.r-project.org) to MongoDB and back using the mongodb-C library. 
@@ -11,8 +11,8 @@ This vignette will provide demos for advanced topics in the **rmongodb** package
 
 
 
-# Connect R to MongoDB
-First of all we have to load the library and to connect to a MongoDB. In this case we connect to our local MongoDB installation.
+# Connecting R to MongoDB
+First of all we have to load the library and connect to a MongoDB. In this case we connect to our local MongoDB installation.
 ```{r connect}
 library(rmongodb)
 mongo <- mongo.create()
@@ -22,8 +22,8 @@ mongo.is.connected(mongo)
 
 
 
-# Insert Big Data
-We will use the "Zip Code Data Set" from MongoDB in the following examples. The data set is included in the **rmongodb** package and can be loaded using the command *data(zips)*. The 'zips' data set holds the MongoDB example data set called "Zip Code Data Set" (http://docs.mongodb.org/manual/tutorial/aggregation-zip-code-data-set/). This data set is available as JSON and hold zip code data from the US.
+# Inserting Big Data
+We will use the "Zip Code Data Set" from MongoDB (http://docs.mongodb.org/manual/tutorial/aggregation-zip-code-data-set/) in the following examples. The data set is included in the **rmongodb** package and can be loaded using the command *data(zips)*. The data set is available as JSON and contains zip code data from the US.
 ```{r insertZips}
 # load example data set from rmongodb
 data(zips)
@@ -39,7 +39,7 @@ if(mongo.is.connected(mongo) == TRUE){
   mongo.insert.batch(mongo, "rmongodb.zips", res )
 }
 ```
-Lets do a small check to test if all inserted data is available in MongoDB.
+Let's check if all the inserted data is available in MongoDB.
 ```{r insertCheck}
 dim(zips)
 if(mongo.is.connected(mongo) == TRUE){
@@ -52,10 +52,10 @@ if(mongo.is.connected(mongo) == TRUE){
 
 
 
-# MongoDB Aggregation Framework
-MongoDB Aggregation Framework is one of the top MongoDB features. Aggregations operations process data records and return computed results. Aggregation operations group values from multiple documents together, and can perform a variety of operations on the grouped data to return a single result. 
+# MongoDB aggregation framework
+The MongoDB aggregation framework is one of the top MongoDB features. Aggregation operations process data records and return computed results. They group values from multiple documents together and can perform a variety of operations on the grouped data to return a single result. 
 
-So far, JSON to BSON conversion is not yet working for aggregation requests in **rmongodb**. Therefore, we have to create these difficult BSON objects.
+So far, JSON to BSON conversion is not yet working for aggregation requests in **rmongodb**. Therefore, we have to create the BSON objects ourselves. Let's compute the total population of each state and group by state:
 ```{r aggregationFrameworkBSON, results='hide'}
 buf <- mongo.bson.buffer.create()
 mongo.bson.buffer.start.object(buf, "$group")
@@ -100,8 +100,8 @@ if(mongo.is.connected(mongo) == TRUE){
 
 
 
-# Drop / Remove collections and databases and Close Connection to MongoDB
-At the end of all your analyses it is a good idea to destroy the connection to your MongoDB and to clean-up collections.
+# Dropping/removing collections and databases and closing the connection to MongoDB
+After you've finished your analysis it's a good idea to destroy the connection to MongoDB and clean up the collections.
 ```{r drop}
 if(mongo.is.connected(mongo) == TRUE){
   mongo.drop(mongo, "rmongodb.zips")
