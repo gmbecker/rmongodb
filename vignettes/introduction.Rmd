@@ -6,10 +6,10 @@ Introduction to the rmongodb Package
 
 MongoDB (www.mongodb.org) is a scalable, high-performance, document-oriented NoSQL database. The **rmongodb** package provides an interface from the statistical software R (www.r-project.org) to MongoDB and back using the mongodb-C library. 
 
-This vignette will provide a first introduction to the **rmongodb** package and a lot of code to get stared. If you need some help to get started with MongoDB please check the resources provided by MongoDB: http://docs.mongodb.org/manual/tutorial/getting-started/
+This vignette will provide a first introduction to the **rmongodb** package and offer a lot of code to get stared. If you need anyhelp getting started with MongoDB please check the resources provided by MongoDB: http://docs.mongodb.org/manual/tutorial/getting-started/
 
 
-# Installing and Loading rmongodb Package
+# Installing and loading the rmongodb package
 There is a stable CRAN version of **rmongodb** available:
 ```{r installRmongodb, eval=FALSE}
 install.packages("rmongodb")
@@ -20,9 +20,9 @@ You can also install the latest development version from the GitHub repository:
 library(devtools)
 install_github("rmongodb", "mongosoup")
 ```
-The installation should be very simple and straightforward. No local MongoDB installation is required. Only if you install from source the RUnit tests will need a local MongoDB installation.
+The installation should be very simple and straightforward. No local MongoDB installation is required. Only if you install from source, the RUnit tests will need a local MongoDB installation.
 
-Afterwards you can load the **rmongodb** package as any other package:
+After you've installed the the **rmongodb** package you can load it just like any other package:
 ```{r loadRmongodb}
 library(rmongodb)
 ```
@@ -32,15 +32,15 @@ library(rmongodb)
 
 
 
-# Connect R to MongoDB
-First of all we have to create a connection to a MongoDB installation. Without parameters we connect to the MongoDB installation running on localhost. Parameters for external installations and user authentication are implemented and documented.
+# Connecting R to MongoDB
+First of all we have to create a connection to a MongoDB installation. If no paramters are provided we connect to the MongoDB installation running on localhost. Parameters for external installations and user authentication are implemented and documented.
 ```{r connect2Mongo}
 help("mongo.create")
 mongo <- mongo.create()
 mongo
 mongo.is.connected(mongo)
 ```
-It is all the time a good idea to check if there is a working connection to your MongoDB to omit errors.
+It's always a good idea to check if there is a working connection to your MongoDB to avoid errors.
 
 ```{r importZIPdata, echo=FALSE, warning=FALSE, results='hide'}
 if(mongo.is.connected(mongo) == TRUE){
@@ -60,14 +60,14 @@ if(mongo.is.connected(mongo) == TRUE){
 
 
 
-# Get Databases and Collections
+# Getting databases and collections
 Get all databases of your MongoDB connection:
 ```{r getDBs}
 if(mongo.is.connected(mongo) == TRUE){
   mongo.get.databases(mongo)
 }
 ```
-Get all collection in a specific database of your MongoDB. In this case for the "rmongodb" database.
+Get all collections in a specific database of your MongoDB (in this case, the "rmongodb" database)
 ```{r getColls}
 if(mongo.is.connected(mongo) == TRUE){
   db <- "rmongodb"
@@ -75,14 +75,14 @@ if(mongo.is.connected(mongo) == TRUE){
 }
 coll <- "rmongodb.zips"
 ```
-We will use the 'zips' collection in the following examples. The 'zips' collection holds the MongoDB example data set called "Zip Code Data Set" (http://docs.mongodb.org/manual/tutorial/aggregation-zip-code-data-set/). This data set is available as JSON and hold zip code data from the US.
+We will use the 'zips' collection in the following examples. The 'zips' collection holds the MongoDB example data set called "Zip Code Data Set" (http://docs.mongodb.org/manual/tutorial/aggregation-zip-code-data-set/). This data set is available as JSON and contains zip code data from the US.
 
 
 
 
 
-# Get Size of Collection, a Sample Document and Values for a Key
-With the command *mongo.count* we can check how many documents are in the collection or in a specific query. More information for all functions can be found in the help files.
+# Getting the size of collections, a sample document and values for a key
+Using the command *mongo.count*, we can check how many documents are in the collection or in the result of a specific query. More information for all functions can be found in the help files.
 ```{r count, echo=TRUE}
 if(mongo.is.connected(mongo) == TRUE){
   help("mongo.count")
@@ -90,7 +90,7 @@ if(mongo.is.connected(mongo) == TRUE){
 }
 ```
 
-For running some queries it is important to know some details about the available data. First of all you can run the command *mongo.find.one* to get one document from your collection.
+In order to run queries it is important to know some details about the available data. First of all you can run the command *mongo.find.one* to get one document from your collection.
 ```{r findOneFirst, echo=TRUE}
 if(mongo.is.connected(mongo) == TRUE){
   mongo.find.one(mongo, coll)
@@ -107,11 +107,8 @@ if(mongo.is.connected(mongo) == TRUE){
 
 
 
-
-
-
-# Find some First Data
-Now we can run first queries on our MongoDB. In this case we ask for one document providing zip code data for the city "COLORADO CITY". Please be aware, the output of *mongo.find.one* is a BSON object which can not be used directly for further analyses in R. Using the command *mongo.bson.to.list* an R list object will be created from the BSON object.
+# Finding some first data
+Now we can run the first queries on our MongoDB. In this case we ask for one document providing zip code data for the city "COLORADO CITY". Please be aware that the output of *mongo.find.one* is a BSON object, which can not be used directly for further analysis in R. Using the command *mongo.bson.to.list*, an R list object will be created from the BSON object.
 ```{r findOne}
 if(mongo.is.connected(mongo) == TRUE){
   cityone <- mongo.find.one(mongo, coll, '{"city":"COLORADO CITY"}')
@@ -122,11 +119,8 @@ if(mongo.is.connected(mongo) == TRUE){
 
 
 
-
-
-
 # Creating BSON objects
-For a long time it was all about creating BSON objects in R. This was a very difficult and error-prone task. Since **rmongodb** version 1.2 you can use JSON directly and the syntax of the **rmongodb** package is much more similar to the MongoDB shell.
+Until recently, working with **rmonbodb** was all about creating BSON objects in R. This was a very difficult and error-prone task. Since **rmongodb** version 1.2 you can use JSON directly, and the syntax of the **rmongodb** package is much more similar to the MongoDB shell.
 ```{r createBSON}
 buf <- mongo.bson.buffer.create()
 mongo.bson.buffer.append(buf, "city", "COLORADO CITY")
@@ -142,8 +136,8 @@ mongo.bson.from.JSON('{"city":"COLORADO CITY"}')
 
 
 
-# Find more Data
-For real analyses it is important to get more than one document of data from MongoDB. In the first case we use the command *mongo.distict* to get an overview about the population distribution. Than, we check for all cities with less than 2 people living there (errors in the data set?). 
+# Finding more data
+For real analyses it is important to get more than one document of data from MongoDB. As an example, we first use the command *mongo.distict* to get an overview about the population distribution. Then we check for all cities with less than two inhabitants (errors in the data set?). 
 ```{r findMore, warning=FALSE}
 if(mongo.is.connected(mongo) == TRUE){
   pop <- mongo.distinct(mongo, coll, "pop")
@@ -160,11 +154,8 @@ if(mongo.is.connected(mongo) == TRUE){
 
 
 
-
-
-
-# Find more Data with more Complex Query
-The analyses gets more interesting creating a more complex query with two arguments. Using the package **jsonlite** you can check and visualize your JSON syntax first. Afterwards we query MongoDB with this JSON query.
+# Finding more data with a more complex query
+The analysis gets more interesting when creating a more complex query with two arguments. Using the package **jsonlite** you can check and visualize your JSON syntax first. Afterwards we query MongoDB with this JSON query.
 ```{r compleyQuery}
 library(jsonlite)
 json <- '{"pop":{"$lte":2}, "pop":{"$gte":1}}'
@@ -185,10 +176,8 @@ mongo.cursor.to.data.frame
 
 
 
-
-
-# Insert some Data to MongoDB
-Another interesting part is inserting data into MongoDB.
+# Inserting some data into MongoDB
+Another interesting point is inserting data into MongoDB.
 ```{r insert}
 # insert data
 a <- mongo.bson.from.JSON( '{"ident":"a", "name":"Markus", "age":33}' )
@@ -210,7 +199,7 @@ if(mongo.is.connected(mongo) == TRUE){
 
 
 
-# Update Documents and create Indices for efficient queries
+# Updating documents and creating indices for efficient queries
 You can also update your data in MongoDB from R and add indices for more efficient queries.
 ```{r update}
 if(mongo.is.connected(mongo) == TRUE){
@@ -230,8 +219,8 @@ if(mongo.is.connected(mongo) == TRUE){
 
 
 
-# Drop / Remove collections and databases and Close Connection to MongoDB
-And there are commands to drop databases and collections in MongoDB. At the end of all your analyses it is a good idea to destroy the connection to your MongoDB.
+# Dropping/removing collections and databases and closing the connection to MongoDB
+Of course there are also commands to drop databases and collections in MongoDB. After you finished all your analyses it's a good idea to destroy the connection to your MongoDB.
 ```{r dropColls}
 if(mongo.is.connected(mongo) == TRUE){
   mongo.drop(mongo, icoll)
