@@ -1,6 +1,11 @@
 rmongodb NEWS
 ========================================================
 
+February 24, 2014
+* rmongodb now depends on plyr for some tests
+* mongo.bson.to.Robject introduced: this function now holds the old functionality of mongo.bson.to.list
+* mongo.bson.to.list now returns in all cases a list!
+
 February 20, 2014
 * vignette improved and now independent of running MongoDB
 * second vignette with Advanced rmongodb Topics added

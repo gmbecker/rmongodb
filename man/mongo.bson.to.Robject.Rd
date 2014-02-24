@@ -32,10 +32,8 @@ type with the names attribute set.
 For example, if you construct a mongo.bson object like
 such:
 
-\preformatted{ buf <- mongo.bson.buffer.create()
-mongo.bson.buffer.append(buf, "First", "Joe")
-mongo.bson.buffer.append(buf, "Last", "Smith") b <-
-mongo.bson.from.buffer(buf) l <- mongo.bson.to.Robject(b) }
+\preformatted{ b <- mongo.bson.from.JSON('{"First":"Joe",
+"Last":"Smith"}') l <- mongo.bson.to.Robject(b) }
 
 You'll get a vector of strings out of it which may be
 indexed by number, like so:
@@ -49,10 +47,8 @@ or by name, like so:
 If, however, the mongo.bson object is made up of disparate
 types like such:
 
-\preformatted{ buf <- mongo.bson.buffer.create()
-mongo.bson.buffer.append(buf, "Name", "Joe Smith")
-mongo.bson.buffer.append(buf, "age", 21.5) b <-
-mongo.bson.from.buffer(buf) l <- mongo.bson.to.Robject(b) }
+\preformatted{ b <- mongo.bson.from.JSON('{"First":"Joe
+Smith", "Last":21.5}') l <- mongo.bson.to.Robject(b) }
 
 You'll get a true list (with the names attribute set) which
 may be indexed by number also:
@@ -81,10 +77,7 @@ Perhaps the best way to see what you are going to get for
 your particular application is to test it.
 }
 \examples{
-buf <- mongo.bson.buffer.create()
-mongo.bson.buffer.append(buf, "name", "Fred")
-mongo.bson.buffer.append(buf, "city", "Dayton")
-b <- mongo.bson.from.buffer(buf)
+b <- mongo.bson.from.JSON('{"name":"Fred", "city":"Dayton"}')
 
 l <- mongo.bson.to.Robject(b)
 print(l)

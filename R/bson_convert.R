@@ -54,10 +54,7 @@ mongo.bson.from.JSON <- function(JSON, simplifyVector=FALSE, ...){
 #' For example, if you construct a mongo.bson object like such:
 #' 
 #' \preformatted{
-#' buf <- mongo.bson.buffer.create()
-#' mongo.bson.buffer.append(buf, "First", "Joe") 
-#' mongo.bson.buffer.append(buf, "Last", "Smith") 
-#' b <- mongo.bson.from.buffer(buf) 
+#' b <- mongo.bson.from.JSON('{"First":"Joe", "Last":"Smith"}')
 #' l <- mongo.bson.to.Robject(b)
 #' }
 #' 
@@ -73,10 +70,7 @@ mongo.bson.from.JSON <- function(JSON, simplifyVector=FALSE, ...){
 #' If, however, the mongo.bson object is made up of disparate types like such:
 #' 
 #' \preformatted{
-#' buf <- mongo.bson.buffer.create()
-#' mongo.bson.buffer.append(buf, "Name", "Joe Smith")
-#' mongo.bson.buffer.append(buf, "age", 21.5) 
-#' b <- mongo.bson.from.buffer(buf)
+#' b <- mongo.bson.from.JSON('{"First":"Joe Smith", "Last":21.5}')
 #' l <- mongo.bson.to.Robject(b)
 #' }
 #' 
@@ -112,10 +106,7 @@ mongo.bson.from.JSON <- function(JSON, simplifyVector=FALSE, ...){
 #' @seealso \code{\link{mongo.bson.from.list}},\cr \code{\link{mongo.bson.to.list}},\cr \link{mongo.bson}.
 #' @examples
 #' 
-#' buf <- mongo.bson.buffer.create()
-#' mongo.bson.buffer.append(buf, "name", "Fred")
-#' mongo.bson.buffer.append(buf, "city", "Dayton")
-#' b <- mongo.bson.from.buffer(buf)
+#' b <- mongo.bson.from.JSON('{"name":"Fred", "city":"Dayton"}')
 #' 
 #' l <- mongo.bson.to.Robject(b)
 #' print(l)
@@ -138,12 +129,12 @@ mongo.bson.to.Robject <- function(b)
 #' @seealso \code{\link{mongo.bson.from.list}}, \code{\link{mongo.bson.to.Robject}},\cr \link{mongo.bson}.
 #' @examples
 #' 
-#' buf <- mongo.bson.buffer.create()
-#' mongo.bson.buffer.append(buf, "name", "Fred")
-#' mongo.bson.buffer.append(buf, "city", "Dayton")
-#' b <- mongo.bson.from.buffer(buf)
+#' b <- mongo.bson.from.JSON('{"name":"Fred", "city":"Dayton"}')
 #' 
 #' l <- mongo.bson.to.list(b)
+#' print(l)
+#' 
+#' l <- mongo.bson.to.list(b, simplify=TRUE)
 #' print(l)
 #' 
 #' @export mongo.bson.to.list

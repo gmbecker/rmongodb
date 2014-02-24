@@ -19,12 +19,12 @@ an R object of the type list
 Convert a \link{mongo.bson} object to an R list object.
 }
 \examples{
-buf <- mongo.bson.buffer.create()
-mongo.bson.buffer.append(buf, "name", "Fred")
-mongo.bson.buffer.append(buf, "city", "Dayton")
-b <- mongo.bson.from.buffer(buf)
+b <- mongo.bson.from.JSON('{"name":"Fred", "city":"Dayton"}')
 
 l <- mongo.bson.to.list(b)
+print(l)
+
+l <- mongo.bson.to.list(b, simplify=TRUE)
 print(l)
 }
 \seealso{
