@@ -22,3 +22,8 @@ README.html
 vignettes/figure/*
 vignettes/*.html
 vignettes/*.md
+vignettes/*.tex
+vignettes/*.log
+vignettes/*.sync*
+vignettes/*.pdf
+
