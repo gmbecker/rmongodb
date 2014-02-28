@@ -13,6 +13,7 @@ rmongodb.sdf
 rmongodb.suo
 rmongodb_*.tar.gz
 src/*.o
+src/libmongo/*.o
 src/*.so
 src/*.rds
 .Rproj.user
