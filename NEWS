@@ -1,6 +1,10 @@
 rmongodb NEWS
 ========================================================
 
+February 28, 2014
+* vignette fixes and improvements
+* mongo.insert.batch error checks added
+
 February 24, 2014
 * rmongodb now depends on plyr for some tests
 * mongo.bson.to.Robject introduced: this function now holds the old functionality of mongo.bson.to.list
