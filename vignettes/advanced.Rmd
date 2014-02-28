@@ -29,13 +29,16 @@ We will use the "Zip Code Data Set" from MongoDB (http://docs.mongodb.org/manual
 data(zips)
 head(zips)
 zips[1,]$loc
-  
+
+# rename _id field. The original zips data set holds duplicate _id values which will fale during the import
+colnames(zips)[5] <- "orig_id"
+
+# create BSON batch object
+ziplist <- list()
+ziplist <- apply( zips, 1, function(x) c( ziplist, x ) )
+res <- lapply( ziplist, function(x) mongo.bson.from.list(x) )
+
 if(mongo.is.connected(mongo) == TRUE){
-  res <- list(length(dim(zips)[1]))
-  for(i in 1:dim(zips)[1]){
-    tmp <- zips[i,] 
-    res[[i]] <- mongo.bson.from.list(tmp)
-  }
   mongo.insert.batch(mongo, "rmongodb.zips", res )
 }
 ```
@@ -45,7 +48,7 @@ dim(zips)
 if(mongo.is.connected(mongo) == TRUE){
   nr <- mongo.count(mongo, "rmongodb.zips")
   print( nr )
-  res <- mongo.find.all(mongo, "rmongodb.zips")
+  res <- mongo.find.all(mongo, "rmongodb.zips", limit=20)
   head(res)
 }
 ```

@@ -47,11 +47,13 @@ if(mongo.is.connected(mongo) == TRUE){
   # load some data
   library(jsonlite)
   data(zips)
-  res <- list(length(dim(zips)[1]))
-  for(i in 1:dim(zips)[1]){
-    tmp <- zips[i,] 
-    res[[i]] <- mongo.bson.from.list(tmp)
-  }
+  # rename _id field. The original zips data set holds duplicate _id values which will fale during the import
+  colnames(zips)[5] <- "orig_id"
+  
+  ziplist <- list()
+  ziplist <- apply( zips, 1, function(x) c( ziplist, x ) )
+  res <- lapply( ziplist, function(x) mongo.bson.from.list(x) )
+  
   mongo.insert.batch(mongo, "rmongodb.zips", res )
 }
 ```
