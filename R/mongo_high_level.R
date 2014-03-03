@@ -1,14 +1,18 @@
-mongo.parse.ns<-function(ns)
+mongo.parse.ns <- function(ns)
 {
   pos <- regexpr('\\.', ns)
-  if (pos == 0) {
-    print("mongo.distinct: No '.' in namespace")
+  if (pos == 0 || pos == -1) {
+    warning("mongo.parse.ns: No '.' in namespace")
     return(NULL)
+  } else {
+    db <- substr(ns, 1, pos-1)
+    collection <- substr(ns, pos+1, nchar(ns))
+    return(list(db=db, collection=collection))
   }
-  db <- substr(ns, 1, pos-1)
-  collection <- substr(ns, pos+1, nchar(ns))
-  return(list(db=db, collection=collection))
 }
+
+
+
 
 #' Get a vector of distinct values for keys in a collection
 #' 
@@ -26,8 +30,7 @@ mongo.parse.ns<-function(ns)
 #' @param query \link{mongo.bson} An optional query to restrict the returned
 #' values.
 #' 
-#' @return NULL if the command failed.  \code{\link{mongo.get.err}()} may be
-#' MONGO_COMMAND_FAILED.
+#' @return vector of distinct values or NULL if the command failed.
 #' 
 #' (vector) The result set of distinct keys.
 #' @seealso \code{\link{mongo.command}},\cr
@@ -49,12 +52,28 @@ mongo.distinct <- function(mongo, ns, key, query=mongo.bson.empty()) {
   ns_parsed <- mongo.parse.ns(ns)
   db <- ns_parsed$db
   collection <- ns_parsed$collection
+  if( is.null(db) || is.null(collection) ){
+    stop("Wrong namespace (ns).")
+  }
+  
   b <- mongo.command(mongo, db, list(distinct=collection, key=key, query=query))
-  if (!is.null(b))
+  
+  if (!is.null(b)){
     b <- mongo.bson.value(b, "values")
-  b
+    if(length(b)==0)
+      warning("No values - probably wrong key!")
+    return(b)
+  } else{
+    warning( mongo.get.server.err.string(mongo) )
+    return(NULL)
+  }
 }
+
 mongo.get.values <- mongo.distinct
+
+
+
+
 
 #' Aggregation pipeline
 #' 
@@ -95,11 +114,15 @@ mongo.get.values <- mongo.distinct
 #' mongo.destroy(mongo = mongo)
 #'
 #' @export mongo.aggregation
-mongo.aggregation<-function(mongo, ns, aggr_cmd_list)
+mongo.aggregation <- function(mongo, ns, aggr_cmd_list)
 {
   ns_parsed <- mongo.parse.ns(ns)
   db <- ns_parsed$db
   collection <- ns_parsed$collection
+  if( is.null(db) || is.null(collection) ){
+    stop("Wrong namespace (ns).")
+  }
+  
   buf <- mongo.bson.buffer.create()
   mongo.bson.buffer.append(buf, "aggregate", collection)
   mongo.bson.buffer.start.array(buf, "pipeline")
@@ -109,5 +132,8 @@ mongo.aggregation<-function(mongo, ns, aggr_cmd_list)
   }
   mongo.bson.buffer.finish.object(buf)
   query <- mongo.bson.from.buffer(buf)
-  return(mongo.command(mongo, db, query))
+  
+  res <- mongo.command(mongo, db, query)
+  
+  return(res)
 }
