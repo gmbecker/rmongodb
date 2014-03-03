@@ -97,19 +97,19 @@ mongo.get.values <- mongo.distinct
 #' \link{mongo}.
 #' 
 #' @examples
-#' # Imagine we have collection with people ids and their ages. Aggregation below finds ids 
-#' # between 1 and 1000, group by age, counts them and push ids into buckets, one per age.
+#' # using the zips example data set
 #' mongo <- mongo.create()
+#' # insert some example data
+#' data(zips)
+#' colnames(zips)[5] <- "orig_id"
+#' ziplist <- list()
+#' ziplist <- apply( zips, 1, function(x) c( ziplist, x ) )
+#' res <- lapply( ziplist, function(x) mongo.bson.from.list(x) )
+#' mongo.insert.batch(mongo, "test.zips", res )
 #' if (mongo.is.connected(mongo)) {
-#'   upper <- 1000
-#'   lower <- 1
-#'   pipe_1 <- mongo.bson.from.list(list("$match" = list('id'=c(list('$lte' = upper), list('$gte' = lower)))))
-#'   pipe_2 <- mongo.bson.from.list(list("$project" = list('id' = 1, 'age'=1)))
-#'   pipe_3 <- mongo.bson.from.list(list("$group" = c(list('_id' = '$age'), list(cnt=list('$sum'=1)), list(ids=list('$push'='$id')))))
-#'   cmd_list <- list(pipe_1, pipe_2, pipe_3)
-#'   aggr <- mongo.aggregation(mongo, ns = 'db.collection', aggr_cmd_list = cmd_list)
-#'   # check results:
-#'   str(mongo.bson.to.list(aggr))
+#'     pipe_1 <- mongo.bson.from.JSON('{"$group":{"_id":"$state", "totalPop":{"$sum":"$pop"}}}')
+#'     cmd_list <- list(pipe_1)
+#'     res <- mongo.aggregation(mongo, "test.zips", cmd_list)
 #' }
 #' mongo.destroy(mongo = mongo)
 #'
@@ -134,6 +134,10 @@ mongo.aggregation <- function(mongo, ns, aggr_cmd_list)
   query <- mongo.bson.from.buffer(buf)
   
   res <- mongo.command(mongo, db, query)
+  
+  if( is.null(res) ){
+    stop(paste("mongoDB error: ", mongo.get.err(mongo), ". Please check ?mongo.get.err for more details.", sep=""))
+  }
   
   return(res)
 }

@@ -42,6 +42,36 @@ if( mongo.is.connected(mongo) ){
   checkTrue(is.null(res))
   
   
+  #mongo.aggregation
+  # load more data for good tests
+  mongo.drop(mongo, ns)
+  data(zips)
+  colnames(zips)[5] <- "orig_id"
+  ziplist <- list()
+  ziplist <- apply( zips, 1, function(x) c( ziplist, x ) )
+  res <- lapply( ziplist, function(x) mongo.bson.from.list(x) )
+  mongo.insert.batch(mongo, ns, res )
+  
+  pipe_1 <- mongo.bson.from.JSON('{"$group":{"_id":"$state", "totalPop":{"$sum":"$pop"}}}')
+  cmd_list <- list(pipe_1)
+  res <- mongo.aggregation(mongo, ns, cmd_list)
+  res <- mongo.bson.value(res, "result")
+  checkEquals(length(res), 51)
+  
+  checkException( mongo.aggregation(mongo, "ns", cmd_list), "Wrong namespace (ns)." )
+  
+  pipe_1 <- mongo.bson.from.JSON('{"$group":{"_ids":"$state", "totalPop":{"$sum":"$pop"}}}')
+  cmd_list <- list(pipe_1)
+  checkException( mongo.aggregation(mongo, ns, cmd_list), "mongoDB error: 10. Please check ?mongo.get.err for more details." )
+  
+  pipe_1 <- mongo.bson.from.JSON('{"$group":{"_id":"$state", "totalPop":{"$sum":"$pop"}}}')
+  pipe_2 <- mongo.bson.from.JSON('{"$match":{"totalPop":{"$gte":10000000}}}')
+  cmd_list <- list(pipe_1, pipe_2)
+  res <- mongo.aggregation(mongo, ns, cmd_list)
+  res <- mongo.bson.value(res, "result")
+  checkEquals(length(res), 7)
+  
+  
   # cleanup db and close connection
   mongo.drop.database(mongo, db)
   mongo.destroy(mongo)
