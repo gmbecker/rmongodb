@@ -1,5 +1,6 @@
 export(as.character.mongo.oid)
 export(mongo.add.user)
+export(mongo.aggregation)
 export(mongo.authenticate)
 export(mongo.binary.binary)
 export(mongo.binary.function)

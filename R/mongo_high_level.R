@@ -1,3 +1,15 @@
+mongo.parse.ns<-function(ns)
+{
+  pos <- regexpr('\\.', ns)
+  if (pos == 0) {
+    print("mongo.distinct: No '.' in namespace")
+    return(NULL)
+  }
+  db <- substr(ns, 1, pos-1)
+  collection <- substr(ns, pos+1, nchar(ns))
+  return(list(db=db, collection=collection))
+}
+
 #' Get a vector of distinct values for keys in a collection
 #' 
 #' Get a vector of distinct values for keys in a collection.
@@ -34,16 +46,68 @@
 #' @export mongo.distinct
 mongo.distinct <- function(mongo, ns, key, query=mongo.bson.empty()) {
   
-  pos <- regexpr('\\.', ns)
-  if (pos == 0) {
-    print("mongo.distinct: No '.' in namespace")
-    return(NULL)
-  }
-  db <- substr(ns, 1, pos-1)
-  collection <- substr(ns, pos+1, nchar(ns))
+  ns_parsed <- mongo.parse.ns(ns)
+  db <- ns_parsed$db
+  collection <- ns_parsed$collection
   b <- mongo.command(mongo, db, list(distinct=collection, key=key, query=query))
   if (!is.null(b))
     b <- mongo.bson.value(b, "values")
   b
 }
 mongo.get.values <- mongo.distinct
+
+#' Aggregation pipeline
+#' 
+#' Aggregation pipeline
+#' 
+#' See
+#' \url{http://docs.mongodb.org/manual/core/aggregation-pipeline/}.
+#' 
+#' 
+#' @param mongo (\link{mongo}) A mongo connection object.
+#' @param ns (string) The namespace of the collection in which to find distinct
+#' keys.
+#' @param aggr_cmd_list \link{mongo.bson} An list representing aggregation query pipeline.
+#' 
+#' @return NULL if the command failed.  \code{\link{mongo.get.err}()} may be
+#' MONGO_COMMAND_FAILED.
+#' 
+#' \link{mongo.bson} The result of aggregation.
+#' @seealso \code{\link{mongo.command}},\cr
+#' \code{\link{mongo.simple.command}},\cr \code{\link{mongo.find}},\cr
+#' \link{mongo}.
+#' 
+#' @examples
+#' # Imagine we have collection with people ids and their ages. Aggregation below finds ids 
+#' # between 1 and 1000, group by age, counts them and push ids into buckets, one per age.
+#' mongo <- mongo.create()
+#' if (mongo.is.connected(mongo)) {
+#'   upper <- 1000
+#'   lower <- 1
+#'   pipe_1 <- mongo.bson.from.list(list("$match" = list('id'=c(list('$lte' = upper), list('$gte' = lower)))))
+#'   pipe_2 <- mongo.bson.from.list(list("$project" = list('id' = 1, 'age'=1)))
+#'   pipe_3 <- mongo.bson.from.list(list("$group" = c(list('_id' = '$age'), list(cnt=list('$sum'=1)), list(ids=list('$push'='$id')))))
+#'   cmd_list <- list(pipe_1, pipe_2, pipe_3)
+#'   aggr <- mongo.aggregation(mongo, ns = 'db.collection', aggr_cmd_list = cmd_list)
+#'   # check results:
+#'   str(mongo.bson.to.list(aggr))
+#' }
+#' mongo.destroy(mongo = mongo)
+#'
+#' @export mongo.aggregation
+mongo.aggregation<-function(mongo, ns, aggr_cmd_list)
+{
+  ns_parsed <- mongo.parse.ns(ns)
+  db <- ns_parsed$db
+  collection <- ns_parsed$collection
+  buf <- mongo.bson.buffer.create()
+  mongo.bson.buffer.append(buf, "aggregate", collection)
+  mongo.bson.buffer.start.array(buf, "pipeline")
+  for (i in (1:length(aggr_cmd_list)))
+  {
+    mongo.bson.buffer.append(buf, as.character(i-1), aggr_cmd_list[[i]]);
+  }
+  mongo.bson.buffer.finish.object(buf)
+  query <- mongo.bson.from.buffer(buf)
+  return(mongo.command(mongo, db, query))
+}
