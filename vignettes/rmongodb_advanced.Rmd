@@ -49,42 +49,31 @@ if(mongo.is.connected(mongo) == TRUE){
   nr <- mongo.count(mongo, "rmongodb.zips")
   print( nr )
   res <- mongo.find.all(mongo, "rmongodb.zips", limit=20)
-  head(res)
+  head( res )
 }
 ```
 
 
 
-# MongoDB aggregation framework
+# MongoDB Aggregation Framework
 The MongoDB aggregation framework is one of the top MongoDB features. Aggregation operations process data records and return computed results. They group values from multiple documents together and can perform a variety of operations on the grouped data to return a single result. 
 
-So far, JSON to BSON conversion is not yet working for aggregation requests in **rmongodb**. Therefore, we have to create the BSON objects ourselves. Let's compute the total population of each state and group by state:
-```{r aggregationFrameworkBSON, results='hide'}
-buf <- mongo.bson.buffer.create()
-mongo.bson.buffer.start.object(buf, "$group")
-mongo.bson.buffer.append(buf, "_id", "$state")
-mongo.bson.buffer.start.object(buf, "totalPop")
-mongo.bson.buffer.append(buf, "$sum", "$pop")
-mongo.bson.buffer.finish.object(buf)
-mongo.bson.buffer.finish.object(buf)
-bson <- mongo.bson.from.buffer(buf)
-
-bufall <- mongo.bson.buffer.create()
-mongo.bson.buffer.append(bufall, "aggregate", "zips")
-mongo.bson.buffer.start.array(bufall, "pipeline")
-mongo.bson.buffer.append(bufall, "0", bson)
-mongo.bson.buffer.finish.object(bufall)
-cmd <- mongo.bson.from.buffer(bufall)
+Let's compute the total population of each state and group by state:
+```{r aggregationFramework}
+pipe_1 <- mongo.bson.from.JSON('{"$group":{"_id":"$state", "totalPop":{"$sum":"$pop"}}}')
+cmd_list <- list(pipe_1)
+cmd_list
+res <- mongo.aggregation(mongo, "rmongodb.zips", cmd_list)
+head( mongo.bson.value(res, "result") )
 ```
-```{r aggregationFrameworkrun}
-cmd
-if(mongo.is.connected(mongo) == TRUE){
-  res <- mongo.command(mongo, "rmongodb", cmd)
-  res
-}
+Ok, I am only interested in the states with populations above 10 Million:
+```{r aggregationFramework2}
+pipe_1 <- mongo.bson.from.JSON('{"$group":{"_id":"$state", "totalPop":{"$sum":"$pop"}}}')
+pipe_2 <- mongo.bson.from.JSON('{"$match":{"totalPop":{"$gte":15000000}}}')
+cmd_list <- list(pipe_1, pipe_2)
+res <- mongo.aggregation(mongo, "rmongodb.zips", cmd_list)
+res
 ```
-
-
 
 
 
