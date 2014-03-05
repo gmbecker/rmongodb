@@ -53,8 +53,6 @@
 
 \begin{document}
 
-\SweaveOpts{concordance=TRUE}
-
 \raggedright
 \footnotesize
 \begin{multicols}{3}
@@ -74,21 +72,30 @@
 \end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\SweaveOpts{concordance=TRUE, eval=TRUE, results=hide}
+
+
 
 \section{Generall Package Handling}
-Install from CRAN
+install from CRAN
 <<eval=FALSE>>=
 install.packages("rmongodb")
 @
-Install from GitHub
+install from GitHub
 <<eval=FALSE>>=
 library(devtools)
 install_github("rmongodb", "mongosoup")
 @
-Load rmongodb package
+load rmongodb package
 <<>>=
 library(rmongodb)
 @
+get help overview
+<<>>=
+??rmongodb
+@
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Connection Handling}
@@ -96,10 +103,11 @@ connect to localhost
 <<>>=
 mongo <- mongo.create()
 @
-connect to extern
+connect to external mongoDB
 <<eval=FALSE>>=
-mongo <- mongo.create(host="127.1.1.1", username="USER", 
-                      password="XXX", db="database")
+mongo <- mongo.create(host="127.1.1.1:27017", 
+            username="USER", password="XXX", 
+            db="database")
 @
 check for working connection
 <<>>=
@@ -110,30 +118,174 @@ disconnect from mongodb
 mongo.destroy(mongo)
 @
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% insert some example data
+<<echo=FALSE, results=hide>>=
+data(zips)
+# rename _id field. The original zips data set holds duplicate _id values which will fale during the import
+colnames(zips)[5] <- "orig_id"
+# create BSON batch object
+ziplist <- list()
+ziplist <- apply( zips, 1, function(x) c( ziplist, x ) )
+res <- lapply( ziplist, function(x) mongo.bson.from.list(x) )
+if(mongo.is.connected(mongo) == TRUE){
+  mongo.insert.batch(mongo, "rmongodb.zips", res )
+}
+@
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Get Database Information}
-get databases and collections
+get databases and collections of a database
 <<>>=
 mongo.get.databases(mongo)
 mongo.get.database.collections(mongo, "rmongodb")
 @
 get errors from mongodb
-<<eval=FALSE>>=
+<<>>=
 mongo.get.err(mongo)
 mongo.get.server.err(mongo)
 mongo.get.server.err.string(mongo)
 @
-deal with replicas
-<<eval=FALSE>>=
+deal with mongoDB replica sets
+<<>>=
 mongo.get.primary(mongo)
 mongo.get.hosts(mongo)
 @
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Get Info about Documents}
+count all elements in collection. Collection name is a namespace with 'database.collection'
+<<>>=
+mongo.count(mongo, "rmongodb.zips")
+@
+get all values for one key (in this case 'city')
+<<results=hide>>=
+mongo.get.values(mongo, "rmongodb.zips", "city")
+@
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Querying Data}
+count element of a special query
+<<>>=
+mongo.count(mongo, "rmongodb.zips", 
+            query='{"state":"AL"}')
+@
+find one document and returns BSON object. For more JSON query syntax check mongodb tutorials: \href{http://docs.mongodb.org/manual/tutorial/query-documents/}{http://docs.mongodb.org/manual/tutorial/query-documents/}
+<<>>=
+bson <- mongo.findOne(mongo, "rmongodb.zips", 
+                      query='{"state":"AL"}')
+@
+find all documents and returns mongo cursor
+<<>>=
+cursor <- mongo.find(mongo, "rmongodb.zips", 
+                     query='{"state":"AL"}')
+@
+convert cursor to R object
+<<results=hide>>=
+mongo.cursor.to.list(cursor)
+@
+directly create R object
+<<>>=
+mongo.find.all(mongo, "rmongodb.zips", 
+              query='{"state":"AL"}')
+@
+skip first 5 documents, limit query to 10 results and only return special keys
+<<>>=
+mongo.find.all(mongo, "rmongodb.zips", 
+              query='{"state":"AL"}',
+              skip=5, limit=10,
+              fields='{"city":1}')
+@
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Dealing with BSON objects}
+convert BSON to R object
+<<results=hide>>=
+mongo.bson.to.list(bson)
+@
+get one key (in this case 'state') out of BSON object
+<<>>=
+mongo.bson.value(bson, "state")
+@
+\subsubsection{Creating BSON objects}
+due to new JSON to BSON functionality no longer required. Since version 1.3 you can directly query with JSON!
+<<>>=
+mongo.bson.from.JSON('{"state":"AL"}')
+@
+old way to create same BSON object
+<<>>=
+buf <- mongo.bson.buffer.create()
+mongo.bson.buffer.append(buf, "state", "AL")
+b <- mongo.bson.from.buffer(buf)
+@
+old way still available. chech help files
+<<>>=
+?mongo.bson
+@
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Importing and Updating Data}
+insert one document to collection
+<<>>=
+mongo.insert(mongo, "rmongodb.insert", 
+             '{"user":"markus", "city":"munich"}')
+@
+insert many documents to collection
+<<>>=
+bson1 <- mongo.bson.from.JSON(
+  '{"user":"markus", "city":"munich"}')
+bson2 <- mongo.bson.from.JSON(
+  '{"user":"peter", "city":"New York"}')
+mongo.insert.batch(mongo, "rmongodb.insert",
+                   list(bson1, bson2))
+@
+add index to collection
+<<>>=
+mongo.index.create(mongo, "rmongodb.insert", '{"user":1}')
+@
+update one document in the collection
+<<>>=
+mongo.update(mongo, "rmongodb.insert", 
+             '{"user":"markus"}', 
+             '{"user":"markus", "city":"berlin"}')
+@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Aggregation Framework}
+grouping and matching on zips example data. Creates BSON output object
+<<>>=
+pipe_1 <- mongo.bson.from.JSON('{"$group":
+                               {"_id":"$state", "totalPop":
+                               {"$sum":"$pop"}}}')
+pipe_2 <- mongo.bson.from.JSON('{"$match":
+                               {"totalPop":
+                               {"$gte":15000000}}}')
+cmd_list <- list(pipe_1, pipe_2)
+bson <- mongo.aggregation(mongo, "rmongodb.zips", cmd_list)
+@
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% remove example db
+<<echo=FALSE, results=hide>>=
+mongo.drop.database(mongo, "rmongodb")
+mongo.destroy(mongo)
+@
 
 
 
