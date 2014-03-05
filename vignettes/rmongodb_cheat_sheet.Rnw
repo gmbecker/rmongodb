@@ -72,7 +72,7 @@
 \end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\SweaveOpts{concordance=TRUE, eval=TRUE, results=hide}
+\SweaveOpts{concordance=TRUE, eval=FALSE, results=hide}
 
 
 
