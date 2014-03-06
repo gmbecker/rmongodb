@@ -35,13 +35,13 @@ colnames(zips)[5] <- "orig_id"
 ziplist <- list()
 ziplist <- apply( zips, 1, function(x) c( ziplist, x ) )
 res <- lapply( ziplist, function(x) mongo.bson.from.list(x) )
-mongo.insert.batch(mongo, "test.zips", res )
 if (mongo.is.connected(mongo)) {
+    mongo.insert.batch(mongo, "test.zips", res )
     pipe_1 <- mongo.bson.from.JSON('{"$group":{"_id":"$state", "totalPop":{"$sum":"$pop"}}}')
     cmd_list <- list(pipe_1)
     res <- mongo.aggregation(mongo, "test.zips", cmd_list)
 }
-mongo.destroy(mongo = mongo)
+mongo.destroy(mongo)
 }
 \seealso{
 \code{\link{mongo.command}},\cr

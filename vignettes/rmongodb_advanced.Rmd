@@ -63,16 +63,20 @@ Let's compute the total population of each state and group by state:
 pipe_1 <- mongo.bson.from.JSON('{"$group":{"_id":"$state", "totalPop":{"$sum":"$pop"}}}')
 cmd_list <- list(pipe_1)
 cmd_list
-res <- mongo.aggregation(mongo, "rmongodb.zips", cmd_list)
-head( mongo.bson.value(res, "result") )
+if(mongo.is.connected(mongo) == TRUE){
+  res <- mongo.aggregation(mongo, "rmongodb.zips", cmd_list)
+  head( mongo.bson.value(res, "result") )
+}
 ```
 Ok, I am only interested in the states with populations above 10 Million:
 ```{r aggregationFramework2}
 pipe_1 <- mongo.bson.from.JSON('{"$group":{"_id":"$state", "totalPop":{"$sum":"$pop"}}}')
 pipe_2 <- mongo.bson.from.JSON('{"$match":{"totalPop":{"$gte":15000000}}}')
 cmd_list <- list(pipe_1, pipe_2)
-res <- mongo.aggregation(mongo, "rmongodb.zips", cmd_list)
-res
+if(mongo.is.connected(mongo) == TRUE){
+  res <- mongo.aggregation(mongo, "rmongodb.zips", cmd_list)
+  res
+}
 ```
 
 
