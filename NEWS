@@ -1,6 +1,10 @@
 rmongodb NEWS
 ========================================================
 
+March 06, 2014
+* new CRAN submission
+* rmongodb cheat sheet added to package
+
 March 03, 2014
 * rmongodb now provides more support for MongoDB Aggregation Framework: mongo.aggregation() - thanks to "dselivanov"
 
