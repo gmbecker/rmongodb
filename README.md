@@ -120,6 +120,8 @@ We use a three step version number system, e.g. v1.2.1:
 * we use roxygen2
 * we write RUnit tests for all new functionality in tests/test_XXX.R
 * for bigger changes we use branches
+* run valgrid to check for memory leaks
+    R -d "valgrind --tool=memcheck --leak-check=full" --vanilla < test_XXX.R
 * CRAN submission:
  * http://cran.r-project.org/submit.html
  * create Package tar.gz via RStudio "Build Source Package"
