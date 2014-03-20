@@ -27,10 +27,8 @@ library(RJSONIO)
 json_file <- "http://media.mongodb.org/zips.json"
 
 rL <- readLines(json_file)
-zips <- NULL
-for(i in rL){
-  zips <- rbind(zips, fromJSON(i))
-}
+
+zips <- do.call(rbind,lapply(rL,fromJSON))
 
 save(zips, file="data/zips.rda", compress="xz")
 }
