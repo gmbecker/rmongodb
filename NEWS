@@ -1,5 +1,7 @@
 rmongodb NEWS
 ========================================================
+March 20, 2014
+* rmongodb now builds new libbson withou error (functionality not yet integrated in code). This is preparation for better JSON2BSON conversion.
 
 March 06, 2014
 * new CRAN submission
