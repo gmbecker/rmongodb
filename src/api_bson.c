@@ -25,7 +25,7 @@ typedef bson bson_buffer;
 
 SEXP mongo_bson_destroy(SEXP b) {
     bson* _b = _checkBSON(b);
-    bson_destroy(_b);
+    bson_destroy_old(_b);
     SEXP ptr = getAttrib(b, sym_mongo_bson);
     R_ClearExternalPtr(ptr);
     return R_NilValue;
@@ -189,7 +189,7 @@ SEXP mongo_bson_empty() {
 
 SEXP mongo_bson_clear(SEXP b) {
     bson* _b = _checkBSON(b);
-    bson_destroy(_b);
+    bson_destroy_old(_b);
     bson_empty(_b);
     return b;
 }
@@ -206,7 +206,7 @@ SEXP mongo_bson_copy(SEXP b) {
 static void bson_bufferFinalizer(SEXP ptr) {
     if (!R_ExternalPtrAddr(ptr)) return;
     bson_buffer* b = (bson_buffer*)R_ExternalPtrAddr(ptr);
-    bson_destroy(b);
+    bson_destroy_old(b);
     Free(b);
     R_ClearExternalPtr(ptr);
 }
@@ -217,7 +217,7 @@ SEXP _mongo_bson_buffer_create() {
     PROTECT(ret = allocVector(INTSXP, 1));
     INTEGER(ret)[0] = 0;
     bson_buffer* buf = Calloc(1, bson_buffer);
-    bson_init(buf);
+    bson_init_old(buf);
     ptr = R_MakeExternalPtr(buf, sym_mongo_bson_buffer, R_NilValue);
     PROTECT(ptr);
     R_RegisterCFinalizerEx(ptr, bson_bufferFinalizer, TRUE);
@@ -996,7 +996,7 @@ SEXP mongo_oid_to_string(SEXP oid) {
     PROTECT(ret = allocVector(STRSXP, 1));
     bson_oid_t* _oid = (bson_oid_t*)R_ExternalPtrAddr(getAttrib(oid, sym_mongo_oid));
     char s[25];
-    bson_oid_to_string(_oid, s);
+    bson_oid_to_string_old(_oid, s);
     SET_STRING_ELT(ret, 0, mkChar(s));
     UNPROTECT(1);
     return ret;
@@ -1007,7 +1007,7 @@ SEXP mongo_oid_print(SEXP oid) {
     _checkOID(oid);
     bson_oid_t* _oid = (bson_oid_t*)R_ExternalPtrAddr(getAttrib(oid, sym_mongo_oid));
     char s[25];
-    bson_oid_to_string(_oid, s);
+    bson_oid_to_string_old(_oid, s);
     Rprintf("{ $oid : \"%s\" }\n", s);
     return oid;
 }
@@ -1102,7 +1102,7 @@ SEXP mongo_bson_buffer_append_bool(SEXP buf, SEXP name, SEXP value) {
                     success = (bson_append_start_array(_buf, _name) == BSON_OK);
                 }
                 else
-                    success = (bson_append_bool(_buf, _name, LOGICAL(value)[i++]) == BSON_OK);
+                    success = (bson_append_bool_old(_buf, _name, LOGICAL(value)[i++]) == BSON_OK);
             }
             else {
                 ijk[depth] = 0;
@@ -1115,22 +1115,22 @@ SEXP mongo_bson_buffer_append_bool(SEXP buf, SEXP name, SEXP value) {
         SEXP names = getAttrib(value, R_NamesSymbol);
         if (names == R_NilValue)
             if (len == 1)
-                success = (bson_append_bool(_buf, _name, asLogical(value)) == BSON_OK);
+                success = (bson_append_bool_old(_buf, _name, asLogical(value)) == BSON_OK);
             else {
                 success = (bson_append_start_array(_buf, _name) == BSON_OK);
                 int i;
                 for (i = 0; i < len && success; i++)
-                    success &= (bson_append_bool(_buf, numstr(i), LOGICAL(value)[i]) == BSON_OK);
+                    success &= (bson_append_bool_old(_buf, numstr(i), LOGICAL(value)[i]) == BSON_OK);
                 success &= (bson_append_finish_object(_buf) == BSON_OK);
             }
         else {
             success = (bson_append_start_object(_buf, _name) == BSON_OK);
             if (len == 1)
-                success &= (bson_append_bool(_buf, _name, asLogical(value)) == BSON_OK);
+                success &= (bson_append_bool_old(_buf, _name, asLogical(value)) == BSON_OK);
             else {
                 int i;
                 for (i = 0; i < len && success; i++)
-                    success &= (bson_append_bool(_buf, CHAR(STRING_ELT(names, i)), LOGICAL(value)[i]) == BSON_OK);
+                    success &= (bson_append_bool_old(_buf, CHAR(STRING_ELT(names, i)), LOGICAL(value)[i]) == BSON_OK);
             }
             success &= (bson_append_finish_object(_buf) == BSON_OK);
         }
@@ -1166,7 +1166,7 @@ SEXP mongo_bson_buffer_append_double(SEXP buf, SEXP name, SEXP value) {
                     success = (bson_append_start_array(_buf, _name) == BSON_OK);
                 }
                 else
-                    success = (bson_append_double(_buf, _name, REAL(value)[i++]) == BSON_OK);
+                    success = (bson_append_double_old(_buf, _name, REAL(value)[i++]) == BSON_OK);
             }
             else {
                 ijk[depth] = 0;
@@ -1179,22 +1179,22 @@ SEXP mongo_bson_buffer_append_double(SEXP buf, SEXP name, SEXP value) {
         SEXP names = getAttrib(value, R_NamesSymbol);
         if (names == R_NilValue)
             if (len == 1)
-                success = (bson_append_double(_buf, _name, asReal(value)) == BSON_OK);
+                success = (bson_append_double_old(_buf, _name, asReal(value)) == BSON_OK);
             else {
                 success = (bson_append_start_array(_buf, _name) == BSON_OK);
                 int i;
                 for (i = 0; i < len && success; i++)
-                    success &= (bson_append_double(_buf, numstr(i), REAL(value)[i]) == BSON_OK);
+                    success &= (bson_append_double_old(_buf, numstr(i), REAL(value)[i]) == BSON_OK);
                 success &= (bson_append_finish_object(_buf) == BSON_OK);
             }
         else {
             success = (bson_append_start_object(_buf, _name) == BSON_OK);
             if (len == 1)
-                success &= (bson_append_double(_buf, _name, asReal(value)) == BSON_OK);
+                success &= (bson_append_double_old(_buf, _name, asReal(value)) == BSON_OK);
             else {
                 int i;
                 for (i = 0; i < len && success; i++)
-                    success &= (bson_append_double(_buf, CHAR(STRING_ELT(names, i)), REAL(value)[i]) == BSON_OK);
+                    success &= (bson_append_double_old(_buf, CHAR(STRING_ELT(names, i)), REAL(value)[i]) == BSON_OK);
                 success &= (bson_append_finish_object(_buf) == BSON_OK);
             }
         }
@@ -1207,8 +1207,8 @@ SEXP mongo_bson_buffer_append_double(SEXP buf, SEXP name, SEXP value) {
 
 int _bson_append_complex(bson_buffer* buf, const char* name, Rcomplex* z) {
     return (bson_append_start_object(buf, name) == BSON_OK &&
-            bson_append_double(buf, "r", z->r) == BSON_OK &&
-            bson_append_double(buf, "i", z->i) == BSON_OK &&
+            bson_append_double_old(buf, "r", z->r) == BSON_OK &&
+            bson_append_double_old(buf, "i", z->i) == BSON_OK &&
             bson_append_finish_object(buf) == BSON_OK) ? BSON_OK : BSON_ERROR;
 }
 
@@ -1369,7 +1369,7 @@ SEXP mongo_bson_buffer_append_raw(SEXP buf, SEXP name, SEXP value, SEXP subtype)
                     success = (bson_append_start_array(_buf, _name) == BSON_OK);
                 }
                 else
-                    success = (bson_append_binary(_buf, _name, _subtype, (char*)(RAW(value) + i++), 1) == BSON_OK);
+                    success = (bson_append_binary_old(_buf, _name, _subtype, (char*)(RAW(value) + i++), 1) == BSON_OK);
             }
             else {
                 ijk[depth] = 0;
@@ -1379,7 +1379,7 @@ SEXP mongo_bson_buffer_append_raw(SEXP buf, SEXP name, SEXP value, SEXP subtype)
         }
     }
     else
-        success = (bson_append_binary(_buf, _name, _subtype, data, len) == BSON_OK);
+        success = (bson_append_binary_old(_buf, _name, _subtype, data, len) == BSON_OK);
     UNPROTECT(1);
     return ret;
 }
@@ -1454,7 +1454,7 @@ SEXP mongo_bson_buffer_append_null(SEXP buf, SEXP name) {
     SEXP ret;
     PROTECT(ret = allocVector(LGLSXP, 1));
     const char* _name = CHAR(STRING_ELT(name, 0));
-    LOGICAL(ret)[0] = (bson_append_null(_buf, _name) == BSON_OK);
+    LOGICAL(ret)[0] = (bson_append_null_old(_buf, _name) == BSON_OK);
     UNPROTECT(1);
     return ret;
 }
@@ -1465,7 +1465,7 @@ SEXP mongo_bson_buffer_append_undefined(SEXP buf, SEXP name) {
     SEXP ret;
     PROTECT(ret = allocVector(LGLSXP, 1));
     const char* _name = CHAR(STRING_ELT(name, 0));
-    LOGICAL(ret)[0] = (bson_append_undefined(_buf, _name) == BSON_OK);
+    LOGICAL(ret)[0] = (bson_append_undefined_old(_buf, _name) == BSON_OK);
     UNPROTECT(1);
     return ret;
 }
@@ -1478,7 +1478,7 @@ SEXP mongo_bson_buffer_append_oid(SEXP buf, SEXP name, SEXP value) {
     bson_oid_t* _value = (bson_oid_t*)R_ExternalPtrAddr(getAttrib(value, sym_mongo_oid));
     SEXP ret;
     PROTECT(ret = allocVector(LGLSXP, 1));
-    LOGICAL(ret)[0] = (bson_append_oid(_buf, _name, _value) == BSON_OK);
+    LOGICAL(ret)[0] = (bson_append_oid_old(_buf, _name, _value) == BSON_OK);
     UNPROTECT(1);
     return ret;
 }
@@ -1610,7 +1610,7 @@ SEXP mongo_bson_buffer_append_timestamp(SEXP buf, SEXP name, SEXP value) {
     ts.i = asInteger(getAttrib(value, sym_increment));
     SEXP ret;
     PROTECT(ret = allocVector(LGLSXP, 1));
-    LOGICAL(ret)[0] = bson_append_timestamp(_buf, _name, &ts) == BSON_OK;
+    LOGICAL(ret)[0] = bson_append_timestamp_old(_buf, _name, &ts) == BSON_OK;
     UNPROTECT(1);
     return ret;
 }
@@ -1621,7 +1621,7 @@ SEXP mongo_bson_buffer_append_code(SEXP buf, SEXP name, SEXP value) {
     const char* _name = CHAR(STRING_ELT(name, 0));
     SEXP ret;
     PROTECT(ret = allocVector(LGLSXP, 1));
-    LOGICAL(ret)[0] = (bson_append_code(_buf, _name, CHAR(STRING_ELT(value, 0))) == BSON_OK);
+    LOGICAL(ret)[0] = (bson_append_code_old(_buf, _name, CHAR(STRING_ELT(value, 0))) == BSON_OK);
     UNPROTECT(1);
     return ret;
 }
@@ -1652,7 +1652,7 @@ SEXP mongo_bson_buffer_append_regex(SEXP buf, SEXP name, SEXP value) {
         options = CHAR(STRING_ELT(opts, 0));
     SEXP ret;
     PROTECT(ret = allocVector(LGLSXP, 1));
-    LOGICAL(ret)[0] = (bson_append_regex(_buf, _name, pattern, options) == BSON_OK);
+    LOGICAL(ret)[0] = (bson_append_regex_old(_buf, _name, pattern, options) == BSON_OK);
     UNPROTECT(1);
     return ret;
 }
@@ -1663,7 +1663,7 @@ SEXP mongo_bson_buffer_append_symbol(SEXP buf, SEXP name, SEXP value) {
     const char* _name = CHAR(STRING_ELT(name, 0));
     SEXP ret;
     PROTECT(ret = allocVector(LGLSXP, 1));
-    LOGICAL(ret)[0] = (bson_append_symbol(_buf, _name, CHAR(STRING_ELT(value, 0))) == BSON_OK);
+    LOGICAL(ret)[0] = (bson_append_symbol_old(_buf, _name, CHAR(STRING_ELT(value, 0))) == BSON_OK);
     UNPROTECT(1);
     return ret;
 }
@@ -1678,7 +1678,7 @@ SEXP mongo_bson_buffer_append_object(SEXP buf, SEXP name, SEXP value) {
     PROTECT(ret = allocVector(LGLSXP, 1));
     int success = (bson_append_start_object(_buf, _name) == BSON_OK);
     if (success)
-        success = (bson_append_bool(_buf, "R_OBJ", 1) == BSON_OK);
+        success = (bson_append_bool_old(_buf, "R_OBJ", 1) == BSON_OK);
     if (success) {
         SEXP R_value;
         PROTECT(R_value = allocVector(STRSXP, 1));
