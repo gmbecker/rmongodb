@@ -1,7 +1,7 @@
 MongoDB BSON C Library
 ================================
 
-Version: 0.4.0
+Version: 0.6.4
 
 URL: https://github.com/mongodb/libbson
 
