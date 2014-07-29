@@ -255,7 +255,11 @@ mongo.find.partial.results   <- 128L
 #' }
 #' 
 #' @export mongo.find
-mongo.find <- function(mongo, ns, query=mongo.bson.empty(), sort=mongo.bson.empty(), fields=mongo.bson.empty(), limit=0L, skip=0L, options=0L) {
+mongo.find <- function(mongo, ns, 
+                       query=mongo.bson.empty(), 
+                       sort=mongo.bson.empty(), 
+                       fields=mongo.bson.empty(), 
+                       limit=0L, skip=0L, options=0L) {
   
   #check for mongodb connection
   if( !mongo.is.connected(mongo))
@@ -331,6 +335,7 @@ mongo.find <- function(mongo, ns, query=mongo.bson.empty(), sort=mongo.bson.empt
 #' @param data.frame (boolean) If TRUE the result will be an \link{data.frame} 
 #' object, if FALSE it will be an \link{list} object. Due to NoSQL in 
 #' mongodb in most cases a data.frame object will not work!
+#' @param mongo.oid2character (boolean) If TRUE monogo_oids will be converted to characters.
 #' @param ...  optional arguments to \link{as.data.frame}
 #' 
 #' @return An R data frame object.
@@ -365,7 +370,7 @@ mongo.find.all <- function(mongo, ns,
                            query=mongo.bson.empty(), sort=mongo.bson.empty(), 
                            fields=mongo.bson.empty(), limit=0L, skip=0L,
                            options=0L,
-                           data.frame=FALSE, mongo.oid2character = FALSE, ...) {
+                           data.frame=FALSE, mongo.oid2character = TRUE, ...) {
   
   #check for mongodb connection
   if( !mongo.is.connected(mongo))

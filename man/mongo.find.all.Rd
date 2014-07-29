@@ -7,7 +7,7 @@
 mongo.find.all(mongo, ns, query = mongo.bson.empty(),
   sort = mongo.bson.empty(), fields = mongo.bson.empty(), limit = 0L,
   skip = 0L, options = 0L, data.frame = FALSE,
-  mongo.oid2character = FALSE, ...)
+  mongo.oid2character = TRUE, ...)
 }
 \arguments{
 \item{mongo}{(\link{mongo}) a mongo connection object.}
@@ -61,6 +61,8 @@ follows: \itemize{ \item\link{mongo.find.cursor.tailable}
 \item{data.frame}{(boolean) If TRUE the result will be an \link{data.frame}
 object, if FALSE it will be an \link{list} object. Due to NoSQL in
 mongodb in most cases a data.frame object will not work!}
+
+\item{mongo.oid2character}{(boolean) If TRUE monogo_oids will be converted to characters.}
 
 \item{...}{optional arguments to \link{as.data.frame}}
 }
