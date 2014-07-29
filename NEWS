@@ -1,5 +1,9 @@
 rmongodb NEWS
 ========================================================
+July 29, 2014
+* mongo.bson.from.df added
+* mongo.find.all re-engineerd
+
 March 20, 2014
 * rmongodb now builds new libbson withou error (functionality not yet integrated in code). This is preparation for better JSON2BSON conversion.
 

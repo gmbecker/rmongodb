@@ -26,3 +26,8 @@ checkEquals(class(out), "mongo.bson")
 checkEquals(class(out2), "list")
 checkTrue( is.vector(out2$a$b) )
 
+# check bson.from.df
+bson_data <- mongo.bson.from.df(cars)
+res <- sapply(bson_data, mongo.bson.to.Robject)
+checkEquals(cars, as.data.frame(t(res)))
+

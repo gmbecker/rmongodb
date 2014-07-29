@@ -6,7 +6,8 @@
 \usage{
 mongo.find.all(mongo, ns, query = mongo.bson.empty(),
   sort = mongo.bson.empty(), fields = mongo.bson.empty(), limit = 0L,
-  skip = 0L, options = 0L, data.frame = FALSE, ...)
+  skip = 0L, options = 0L, data.frame = FALSE,
+  mongo.oid2character = FALSE, ...)
 }
 \arguments{
 \item{mongo}{(\link{mongo}) a mongo connection object.}

@@ -191,3 +191,59 @@ mongo.bson.to.list <- function(b, simplify=FALSE){
 mongo.bson.from.list <- function(lst)
   .Call(".mongo.bson.from.list", lst)
 
+
+#' Convert a data.frame to a mongo.bson object
+#' 
+#' Convert a data.frame to a \link{mongo.bson} object.
+#' 
+#' This function permits the simple and convenient creation of a mongo.bson
+#' object.  This bypasses the creation of a \link{mongo.bson.buffer}, appending
+#' fields one by one, and then turning the buffer into a mongo.bson object with
+#' \code{\link{mongo.bson.from.buffer}()}.
+#'
+#' @param df (data.frame) The data.frame to convert.
+#' 
+#' This \emph{must} be a data.frame, \emph{not} a vector of atomic types; otherwise,
+#' an error is thrown; use \code{as.data.frame()} as necessary.
+#' @return (\link{mongo.bson}) A mongo.bson object serialized from \code{data.frame}.
+#' @seealso \code{\link{mongo.bson.to.list}},\cr \link{mongo.bson},\cr
+#' \code{\link{mongo.bson.destroy}}.
+#' 
+#' @examples
+#' df <- data.frame(name=c("John", "Peter"), age=c(32,18))
+#' b <- mongo.bson.from.df(df)
+#' 
+#' @export mongo.bson.from.df
+mongo.bson.from.df <- function(df){
+  # Put each row to a seperate list item
+  #data_list = apply(dataframe,1,as.list) # Cannot be done like this because then the data type is coersed
+  
+  data_list <- vector("list", nrow(df))
+  for( i in 1:nrow(df) ) data_list[[i]] <- as.list(df[i, ])
+  
+  
+  
+  # Convert any numbers saved as string to numeric adata
+  data_list <- lapply(data_list,function(x) { lapply(x,function(y) {
+    if ( suppressWarnings(!is.na(as.numeric(y))) & !is.integer(y) & !(class(y)[1]=="POSIXct") ) {as.numeric(y)}else{y}
+  })
+  })
+  
+  # Iterate over the table and create the BSON object
+  bson_data <- lapply(data_list,function(x){
+    idx <- 1
+    names <- names(x)
+    buf <- mongo.bson.buffer.create()
+    
+    lapply(x,function(y) {
+      mongo.bson.buffer.append(buf, names[idx], y)
+      idx <<- idx+1
+    })
+    
+    mongo.bson.from.buffer(buf)
+  })
+  
+  
+  return(bson_data)
+  
+}

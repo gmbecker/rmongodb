@@ -365,20 +365,55 @@ mongo.find.all <- function(mongo, ns,
                            query=mongo.bson.empty(), sort=mongo.bson.empty(), 
                            fields=mongo.bson.empty(), limit=0L, skip=0L,
                            options=0L,
-                           data.frame=FALSE, ...) {
+                           data.frame=FALSE, mongo.oid2character = FALSE, ...) {
   
   #check for mongodb connection
   if( !mongo.is.connected(mongo))
     stop("No mongoDB connection!")
   
+  if(data.frame==T & mongo.oid2character == F)
+    warning("You won't get correct id in your data.frame if you don't set mongo.oid2character to TRUE")
+  
   cursor <- mongo.find(mongo, ns, query=query, sort=sort, fields=fields, limit=limit, skip=skip, options=options)
   
-  if( data.frame == TRUE ){
-    res <- mongo.cursor.to.data.frame(cursor, ...)
-  } else
-    res <- mongo.cursor.to.list(cursor)
+  # Step though the matching records
+  idx <- 1
+  temp <- list()
   
-  return(res)
+  while (mongo.cursor.next(cursor)){
+    temp[[idx]] <- mongo.bson.to.list(mongo.cursor.value(cursor))
+    idx <- idx+1
+  }
+  
+  if(mongo.oid2character){
+    temp <- lapply(temp,function(x) {
+      lapply(x,function(y){
+        if(class(y)[1]=="mongo.oid")
+          as.character.mongo.oid(y)
+        else
+          y
+      }
+      )
+    }
+    )
+  }
+  
+  
+  if(data.frame){
+    
+    temp <- do.call(rbind, lapply(temp, function(x) data.frame(x,stringsAsFactors=F)) )
+    
+    if(!is.null(temp)) {
+      colnames <- colnames(temp)
+      select <- (colnames=="X_id")
+      colnames[select] <- "_id"
+      colnames(temp) <- colnames
+    }
+  }
+  
+  
+  
+  return(temp)
   
 }
 mongo.find.batch <- mongo.find.all
