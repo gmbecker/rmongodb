@@ -1,5 +1,8 @@
 rmongodb NEWS
 ========================================================
+September 16, 2014
+* mongo.bson.from.list fix for empty lists
+
 July 29, 2014
 * mongo.bson.from.df added
 * mongo.find.all re-engineerd
