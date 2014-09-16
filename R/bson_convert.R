@@ -188,9 +188,13 @@ mongo.bson.to.list <- function(b, simplify=FALSE){
 #' # { "president" : "Jefferson", "vice" : "Burr" }
 #' 
 #' @export mongo.bson.from.list
-mongo.bson.from.list <- function(lst)
-  .Call(".mongo.bson.from.list", lst)
-
+mongo.bson.from.list <- function(lst){
+  if(length(lst)){
+    .Call(".mongo.bson.from.list", lst)
+  } else {
+    mongo.bson.empty()
+  }
+}
 
 #' Convert a data.frame to a mongo.bson object
 #' 
