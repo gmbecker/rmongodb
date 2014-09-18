@@ -1758,25 +1758,22 @@ SEXP mongo_bson_buffer_append(SEXP buf, SEXP name, SEXP value) {
 SEXP mongo_bson_buffer_append_list(SEXP buf, SEXP name, SEXP value) {
     bson_buffer* _buf = _checkBuffer(buf);
     const char* _name = CHAR(STRING_ELT(name, 0));
-    int success = (bson_append_start_object(_buf, _name) == BSON_OK);
+    int success;
     int len = LENGTH(value);
     int i;
     SEXP names = getAttrib(value, R_NamesSymbol);
-    SEXP fname;
-    if (names != R_NilValue)
+    if (names != R_NilValue){
+        success = (bson_append_start_object(_buf, _name) == BSON_OK);
         for (i = 0; i < len && success; i++) {
-            PROTECT(fname = allocVector(STRSXP, 1));
-            SET_STRING_ELT(fname, 0, STRING_ELT(names, i));
-            success &= LOGICAL(mongo_bson_buffer_append(buf, fname, VECTOR_ELT(value, i)))[0];
-            UNPROTECT(1);
+            success &= LOGICAL(mongo_bson_buffer_append(buf, mkString(CHAR(STRING_ELT(names, i))), VECTOR_ELT(value, i)))[0];
         }
-    else
+    }
+    else {
+        success = (bson_append_start_array(_buf, _name) == BSON_OK);
         for (i = 0; i < len && success; i++) {
-            PROTECT(fname = allocVector(STRSXP, 1));
-            SET_STRING_ELT(fname, 0, mkChar(numstr(i+1)));
-            success &= LOGICAL(mongo_bson_buffer_append(buf, fname, VECTOR_ELT(value, i)))[0];
-            UNPROTECT(1);
+            success &= LOGICAL(mongo_bson_buffer_append(buf, mkString(""), VECTOR_ELT(value, i)))[0];
         }
+    }
     success &= (bson_append_finish_object(_buf) == BSON_OK);
     SEXP ret;
     PROTECT(ret = allocVector(LGLSXP, 1));
