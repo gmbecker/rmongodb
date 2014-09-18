@@ -18,6 +18,8 @@
 #include "api_bson.h"
 #include "symbols.h"
 #include "utility.h"
+#include <string.h>
+#include <stdio.h>
 
 static void mongoFinalizer(SEXP ptr) {
     if (!R_ExternalPtrAddr(ptr)) return;
@@ -294,6 +296,18 @@ SEXP rmongo_find(SEXP mongo_conn, SEXP ns, SEXP query, SEXP sort, SEXP fields, S
         _options |= INTEGER(options)[i];
 
     mongo_cursor* cursor = mongo_find(conn, _ns, q, _fields, _limit, _skip, _options);
+    
+    //null pointer means runtime error (e.g. out of memory)
+    if(!cursor){
+      bson out;
+      char* str = calloc(strlen(_ns)+1, sizeof(char));
+      strcpy(str, _ns);
+      char* _db = strtok(str, ".");
+      if (mongo_cmd_get_last_error(conn, _db, &out) != MONGO_OK) {
+        error(conn->lasterrstr);
+      }
+      error("find failed with unknown error.");
+    }
 
     if (q == &sorted_query)
         bson_destroy_old(&sorted_query);
