@@ -3,7 +3,7 @@
 \alias{mongo.bson.to.list}
 \title{Convert a mongo.bson object to an R list object.}
 \usage{
-mongo.bson.to.list(b, simplify = FALSE)
+mongo.bson.to.list(b, simplify = TRUE)
 }
 \arguments{
 \item{b}{(\link{mongo.bson}) The mongo.bson object to convert.}
@@ -18,13 +18,10 @@ an R object of the type list
 Convert a \link{mongo.bson} object to an R list object.
 }
 \examples{
-b <- mongo.bson.from.JSON('{"name":"Fred", "city":"Dayton"}')
-
-l <- mongo.bson.to.list(b)
-print(l)
-
-l <- mongo.bson.to.list(b, simplify=TRUE)
-print(l)
+l <- list(num=1:3, bool=c(TRUE, FALSE), str="blabla", nul=NULL)
+b <- mongo.bson.from.list(l)
+print(mongo.bson.to.list(b))
+print(mongo.bson.to.list(b, simplify=FALSE))
 }
 \seealso{
 \code{\link{mongo.bson.from.list}}, \code{\link{mongo.bson.to.Robject}},\cr \link{mongo.bson}.
