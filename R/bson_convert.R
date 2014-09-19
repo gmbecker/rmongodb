@@ -129,24 +129,20 @@ mongo.bson.to.Robject <- function(b)
 #' @seealso \code{\link{mongo.bson.from.list}}, \code{\link{mongo.bson.to.Robject}},\cr \link{mongo.bson}.
 #' @examples
 #' 
-#' b <- mongo.bson.from.JSON('{"name":"Fred", "city":"Dayton"}')
-#' 
-#' l <- mongo.bson.to.list(b)
-#' print(l)
-#' 
-#' l <- mongo.bson.to.list(b, simplify=TRUE)
-#' print(l)
+#' l <- list(num=1:3, bool=c(TRUE, FALSE), str="blabla", nul=NULL)
+#' b <- mongo.bson.from.list(l)
+#' print(mongo.bson.to.list(b))
+#' print(mongo.bson.to.list(b, simplify=FALSE))
 #' 
 #' @export mongo.bson.to.list
-mongo.bson.to.list <- function(b, simplify=FALSE){
-  
-  res <- as.list( .Call(".mongo.bson.to.list", b) )
-  
-  if( simplify==TRUE && length(res) != 0 ){
-    res <- simplify2array(res)
-  } 
-  
-  return(res)
+mongo.bson.to.list <- function(b, simplify = TRUE){
+  if(isTRUE(simplify)){
+    # This is the old behavior implemented by Gerald
+    as.list(.Call(".mongo.bson.to.list", b))
+  } else {
+    # This is the new code implemented by Jeroen
+    .Call("R_ConvertObject", b)
+  }
 }
 
 

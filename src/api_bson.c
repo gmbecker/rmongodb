@@ -1771,7 +1771,7 @@ SEXP mongo_bson_buffer_append_list(SEXP buf, SEXP name, SEXP value) {
     else {
         success = (bson_append_start_array(_buf, _name) == BSON_OK);
         for (i = 0; i < len && success; i++) {
-            success &= LOGICAL(mongo_bson_buffer_append(buf, mkString(""), VECTOR_ELT(value, i)))[0];
+            success &= LOGICAL(mongo_bson_buffer_append(buf, mkString(numstr(i)), VECTOR_ELT(value, i)))[0];
         }
     }
     success &= (bson_append_finish_object(_buf) == BSON_OK);
