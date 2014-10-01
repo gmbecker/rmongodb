@@ -123,7 +123,7 @@ mongo.bson.to.Robject <- function(b)
 #' 
 #' 
 #' @param b (\link{mongo.bson}) The mongo.bson object to convert.
-#' @param simplify logical (default: FALSE); should the result be simplified to a vector, matrix 
+#' @param simplify logical (default: TRUE); should the result be simplified to a vector, matrix 
 #' or higher dimensional array if possible?
 #' @return an R object of the type list
 #' @seealso \code{\link{mongo.bson.from.list}}, \code{\link{mongo.bson.to.Robject}},\cr \link{mongo.bson}.
@@ -135,8 +135,10 @@ mongo.bson.to.Robject <- function(b)
 #' print(mongo.bson.to.list(b, simplify=FALSE))
 #' 
 #' @export mongo.bson.to.list
-mongo.bson.to.list <- function(b, simplify = TRUE){
+mongo.bson.to.list <- function(b, simplify = TRUE) {
   if(isTRUE(simplify)){
+    warning('Probably, behavior of this function will be changed in future releases: 
+            default value of simplify parameter will be setted up to FALSE.')
     # This is the old behavior implemented by Gerald
     as.list(.Call(".mongo.bson.to.list", b))
   } else {

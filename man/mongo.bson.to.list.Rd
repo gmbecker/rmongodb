@@ -8,7 +8,7 @@ mongo.bson.to.list(b, simplify = TRUE)
 \arguments{
 \item{b}{(\link{mongo.bson}) The mongo.bson object to convert.}
 
-\item{simplify}{logical (default: FALSE); should the result be simplified to a vector, matrix
+\item{simplify}{logical (default: TRUE); should the result be simplified to a vector, matrix
 or higher dimensional array if possible?}
 }
 \value{
