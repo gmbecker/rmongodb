@@ -121,3 +121,48 @@ mongo.index.create <- function(mongo, ns, key, options=0L) {
 }
 
 
+
+
+
+#' Add a time to live (TTL) index to a collection
+#' 
+#' Add a time to live (TTL) index to a collection
+#' 
+#' See \url{http://docs.mongodb.org/manual/tutorial/expire-data}.
+#' 
+#' 
+#' @param mongo (\link{mongo}) A mongo connection object.
+#' @param ns (string) The namespace of the collection to add a TTL index to.
+#' @param field (string) The desired field to use as the basis for expiration time. The field should be of type 'Date'
+#' @param index_name (string) The name of the index to be created.
+#' @param expireAfterSeconds (Numeric or Integer) The time in seconds after which records should be removed.
+#' 
+#' @return NULL if the command failed.  \code{\link{mongo.get.err}()} may be
+#' MONGO_COMMAND_FAILED.
+#' 
+#' (\link{mongo.bson}) The server's response if successful.
+#' 
+#' @seealso \code{\link{mongo.index.create}}
+#' 
+#' @export mongo.index.TTLcreate
+mongo.index.TTLcreate <- function(mongo, ns, field, index_name, expireAfterSeconds) {
+  
+  #check for mongodb connection
+  if( !mongo.is.connected(mongo))
+    stop("No mongoDB connection!")
+  
+  indexes = list()
+  key=list()
+  key[[field]] <- 1L
+  
+  indexes[["name"]] <- index_name
+  indexes[["expireAfterSeconds"]] <- expireAfterSeconds
+  indexes[["key"]] <- key
+  
+  
+  listCreateIndex <- list(    createIndexes = sub(".*\\.", "", ns), indexes = list(indexes)  )                 
+  
+  bsonCreateIndex <- mongo.bson.from.list(listCreateIndex)
+  mongo.command(mongo, db = gsub("\\..*","",ns), bsonCreateIndex)
+  
+}
