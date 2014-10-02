@@ -839,6 +839,7 @@ SEXP _mongo_bson_to_list(bson* b) {
             case BSON_DOUBLE: ;
             case BSON_STRING: ;
             case BSON_BOOL: ;
+            //case BSON_BINDATA: ;
             case BSON_DATE:
                 continue;
             case BSON_OBJECT:
@@ -902,6 +903,15 @@ SEXP _mongo_bson_to_list(bson* b) {
                 LOGICAL(ret)[i++] = bson_iterator_bool(&iter);
             }
             break;
+        /*    
+        case BSON_BINDATA:
+            PROTECT(ret = allocVector(VECSXP, count));
+            while(sub_type = bson_iterator_next(&iter)) {
+                SET_STRING_ELT(names, i, mkChar(bson_iterator_key(&iter)));
+                SET_VECTOR_ELT(ret, i++, _mongo_bson_value(&iter));
+            }
+            break;
+        */
         case BSON_OBJECT: /* complex */
             PROTECT(ret = allocVector(CPLXSXP, count));
             while (bson_iterator_next(&iter)) {
@@ -917,13 +927,11 @@ SEXP _mongo_bson_to_list(bson* b) {
         UNPROTECT(2);
         return ret;
     }
-
-    SEXP el;
+    
     PROTECT(ret = allocVector(VECSXP, count));
-    for (; (sub_type = bson_iterator_next(&iter)); i++) {
+    while(sub_type = bson_iterator_next(&iter)) {
         SET_STRING_ELT(names, i, mkChar(bson_iterator_key(&iter)));
-        el = _mongo_bson_value(&iter);
-        SET_VECTOR_ELT(ret, i, el);
+        SET_VECTOR_ELT(ret, i++, _mongo_bson_value(&iter));
     }
     setAttrib(ret, R_NamesSymbol, names);
     UNPROTECT(2);
@@ -1379,7 +1387,8 @@ SEXP mongo_bson_buffer_append_raw(SEXP buf, SEXP name, SEXP value, SEXP subtype)
         }
     }
     else
-        success = (bson_append_binary_old(_buf, _name, _subtype, data, len) == BSON_OK);
+    success = (bson_append_binary_old(_buf, _name, _subtype, data, len) == BSON_OK);
+    LOGICAL(ret)[0] = success;
     UNPROTECT(1);
     return ret;
 }

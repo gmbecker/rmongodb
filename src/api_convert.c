@@ -39,10 +39,14 @@ SEXP ConvertValue(bson_iterator* iter){
         case BSON_OBJECT:
             bson_iterator_subobject(iter, &sub);
             return ConvertObject(&sub, true);
+        case BSON_BINDATA: 
+            // call _raw_create helper function from api_bson.c
+            return _raw_create( bson_iterator_bin_type(iter),
+                                bson_iterator_bin_data(iter),
+                                bson_iterator_bin_len(iter));
         case BSON_NULL:
         case BSON_TIMESTAMP:
         case BSON_OID:
-        case BSON_BINDATA:
         case BSON_REGEX:
         case BSON_UNDEFINED:
         case BSON_SYMBOL:
