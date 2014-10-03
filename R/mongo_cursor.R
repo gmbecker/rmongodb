@@ -81,7 +81,7 @@ mongo.cursor.to.list <- function(cursor, nullToNA = TRUE){
 #' 
 mongo.cursor.to.rlist <- function (cursor, keep.ordering = TRUE) {
   # make environment to avoid extra copies
-  e <- new.env()
+  e <- new.env(parent = emptyenv())
   i <- 1
   while (mongo.cursor.next(cursor)) {
     assign(x = as.character(i), 
