@@ -29,11 +29,6 @@
 #' 
 #' @export mongo.cursor.to.list
 mongo.cursor.to.list <- function(cursor, nullToNA = TRUE){
-  
-  warning("This function depreciated and fails for most NoSQL data structures. 
-          Probably its functionality in future releaeses will be changed to be equal to mongo.cursor.to.rlist.")
-  warning('PLEASE CHECK FUNCTION mongo.cursor.to.rlist')
-  
   res <- list()
   while ( mongo.cursor.next(cursor) ){
     val <- mongo.bson.to.list(mongo.cursor.value(cursor))
@@ -50,10 +45,11 @@ mongo.cursor.to.list <- function(cursor, nullToNA = TRUE){
 #' @name mongo.cursor.to.rlist
 #' @title Convert Mongo Cursor Object to List so that each element of resulting list represents document in source collection.
 #' 
-#' @description Converts a mongo cursor object to a list by interating over all cursor objects and combining them. But in contrast to
-#' \link{mongo.cursor.to.list} it doesn't make any data processing.
+#' @description Converts a mongo cursor object to a list by interating over all cursor objects and combining them. 
+#' In contrast to \link{mongo.cursor.to.list} it doesn't make any data coercion!
 #' Just one-to-one mapping with documents in source collection.
-#' @details Function uses environments to avoid extra copying. It is much faster than \link{mongo.cursor.to.list}.
+#' @details Function uses environments to avoid extra copying. It is much faster than \link{mongo.cursor.to.list} 
+#' and in next release will replace it.
 #' @param cursor (\link{mongo.cursor}) A mongo.cursor object returned from
 #' \code{\link{mongo.find}()}.
 #' @param keep.ordering should the records be returned at the same order as fetched from cursor (if sorting was specified in query)? 
@@ -85,7 +81,7 @@ mongo.cursor.to.rlist <- function (cursor, keep.ordering = TRUE) {
   i <- 1
   while (mongo.cursor.next(cursor)) {
     assign(x = as.character(i), 
-           value = mongo.bson.to.list(mongo.cursor.value(cursor), simplify = FALSE), 
+           value = mongo.bson.to.list(mongo.cursor.value(cursor)), 
            envir = e)
     i <- i + 1
   }

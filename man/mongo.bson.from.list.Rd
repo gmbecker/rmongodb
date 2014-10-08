@@ -19,13 +19,15 @@ Convert a list to a \link{mongo.bson} object.
 }
 \details{
 This function permits the simple and convenient creation of a mongo.bson
-object.  This bypasses the creation of a \link{mongo.bson.buffer}, appending
+object. This bypasses the creation of a \link{mongo.bson.buffer}, appending
 fields one by one, and then turning the buffer into a mongo.bson object with
 \code{\link{mongo.bson.from.buffer}()}.
 
-Note that this function and \code{\link{mongo.bson.to.list}()} do not always
-perform inverse conversions since mongo.bson.to.list() will convert objects
-and subobjects to atomic vectors if possible.
+Note that this function and \code{\link{mongo.bson.to.list}()} perform inverse conversions.
+}
+\note{
+Function converts unnamed R lists into bson arrays.
+It is very easy to construct bson object of any form using this function and list.
 }
 \examples{
 lst <- list(name="John", age=32)
@@ -39,6 +41,11 @@ v <- c(president="Jefferson", vice="Burr")
 b <- mongo.bson.from.list(as.list(v))
 # the above produces a BSON object of the form:
 # { "president" : "Jefferson", "vice" : "Burr" }
+# Let's try to construct bson with array.
+# This one
+mongo.bson.from.list(list(fruits = list('apple', 'banana', 'orange')))
+# will produce a BSON object of the form:
+# {"fruits" : ["apple", "banana", "orange"]}
 }
 \seealso{
 \code{\link{mongo.bson.to.list}},\cr \link{mongo.bson},\cr

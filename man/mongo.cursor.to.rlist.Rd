@@ -16,12 +16,13 @@ For speed try to set this parameter to FALSE. This will prevent sorting after fe
 An R \link{list} object.
 }
 \description{
-Converts a mongo cursor object to a list by interating over all cursor objects and combining them. But in contrast to
-\link{mongo.cursor.to.list} it doesn't make any data processing.
+Converts a mongo cursor object to a list by interating over all cursor objects and combining them.
+In contrast to \link{mongo.cursor.to.list} it doesn't make any data coercion!
 Just one-to-one mapping with documents in source collection.
 }
 \details{
-Function uses environments to avoid extra copying. It is much faster than \link{mongo.cursor.to.list}.
+Function uses environments to avoid extra copying. It is much faster than \link{mongo.cursor.to.list}
+and in next release will replace it.
 }
 \examples{
 mongo <- mongo.create()
