@@ -29,9 +29,6 @@
 #' 
 #' @export mongo.cursor.to.list
 mongo.cursor.to.list <- function(cursor, nullToNA = TRUE){
-  
-  warning("This fails for most NoSQL data structures. I am working on a new solution")
-  
   res <- list()
   while ( mongo.cursor.next(cursor) ){
     val <- mongo.bson.to.list(mongo.cursor.value(cursor))
@@ -45,7 +42,54 @@ mongo.cursor.to.list <- function(cursor, nullToNA = TRUE){
   
   return(res)
 }
-
+#' @name mongo.cursor.to.rlist
+#' @title Convert Mongo Cursor Object to List so that each element of resulting list represents document in source collection.
+#' 
+#' @description Converts a mongo cursor object to a list by interating over all cursor objects and combining them. 
+#' In contrast to \link{mongo.cursor.to.list} it doesn't make any data coercion!
+#' Just one-to-one mapping with documents in source collection.
+#' @details Function uses environments to avoid extra copying. It is much faster than \link{mongo.cursor.to.list} 
+#' and in next release will replace it.
+#' @param cursor (\link{mongo.cursor}) A mongo.cursor object returned from
+#' \code{\link{mongo.find}()}.
+#' @param keep.ordering should the records be returned at the same order as fetched from cursor (if sorting was specified in query)? 
+#' For speed try to set this parameter to FALSE. This will prevent sorting after fetching from cursor.
+#' @return An R \link{list} object.
+#' 
+#' @seealso \code{\link{mongo.find}},\cr \code{\link{mongo.bson.to.list}}.
+#' 
+#' @examples
+#' mongo <- mongo.create()
+#' if (mongo.is.connected(mongo)) {
+#'     buf <- mongo.bson.buffer.create()
+#'     mongo.bson.buffer.append(buf, "age", 22L)
+#'     query <- mongo.bson.from.buffer(buf)
+#' 
+#'     # Find the first 100 records
+#'     #    in collection people of database test where age == 22
+#'     cursor <- mongo.find(mongo, "test.people", query, limit=100L)
+#' 
+#'     res <- mongo.cursor.to.rlist(cursor)
+#' 
+#' }
+#' 
+#' @export mongo.cursor.to.rlist
+#' 
+mongo.cursor.to.rlist <- function (cursor, keep.ordering = TRUE) {
+  # make environment to avoid extra copies
+  e <- new.env(parent = emptyenv())
+  i <- 1
+  while (mongo.cursor.next(cursor)) {
+    assign(x = as.character(i), 
+           value = mongo.bson.to.list(mongo.cursor.value(cursor)), 
+           envir = e)
+    i <- i + 1
+  }
+  # convert back to list
+  res <- as.list(e)
+  if (isTRUE(keep.ordering)) setNames(res[order(as.integer(names(res)))], NULL)
+  else setNames(res, NULL)
+}
 
 
 #' Convert Mongo Cursor Object to Data.Frame 

@@ -3,12 +3,13 @@
 \alias{mongo.bson.to.list}
 \title{Convert a mongo.bson object to an R list object.}
 \usage{
-mongo.bson.to.list(b, simplify = TRUE)
+mongo.bson.to.list(b, simplify = FALSE)
 }
 \arguments{
 \item{b}{(\link{mongo.bson}) The mongo.bson object to convert.}
 
-\item{simplify}{logical (default: FALSE); should the result be simplified to a vector, matrix
+\item{simplify}{DEPRECIATED PARAMETER - it is kept to provide compatibility with previous behavior.
+\link{logical} (default: FALSE); should the result be simplified to a vector, matrix
 or higher dimensional array if possible?}
 }
 \value{
@@ -17,11 +18,20 @@ an R object of the type list
 \description{
 Convert a \link{mongo.bson} object to an R list object.
 }
+\note{
+Now arrays in bson document are 1) converted into unnamed lists 2) they are converted WITHOUT any SIMPLIFYING!
+If you need old behavior, please use this function with simplify = TRUE;
+Please see examples below;
+}
 \examples{
-l <- list(num=1:3, bool=c(TRUE, FALSE), str="blabla", nul=NULL)
+# arrays will be converted into unnamed lists without any symplifying:
+l <- list(storageArray = list(list(key = 'value_1'), list(key = 'value_2')))
+# Here we construct bson of form {'storageArray':[{'key':'value_1'}, {'key':'value_2'}]}
 b <- mongo.bson.from.list(l)
-print(mongo.bson.to.list(b))
-print(mongo.bson.to.list(b, simplify=FALSE))
+# old behavior
+print(mongo.bson.to.list(b, simplify = TRUE))
+# current behavior
+print(mongo.bson.to.list(b, simplify = FALSE))
 }
 \seealso{
 \code{\link{mongo.bson.from.list}}, \code{\link{mongo.bson.to.Robject}},\cr \link{mongo.bson}.

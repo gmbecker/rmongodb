@@ -256,10 +256,10 @@ mongo.find.partial.results   <- 128L
 #' 
 #' @export mongo.find
 mongo.find <- function(mongo, ns, 
-                       query=mongo.bson.empty(), 
-                       sort=mongo.bson.empty(), 
-                       fields=mongo.bson.empty(), 
-                       limit=0L, skip=0L, options=0L) {
+                       query = mongo.bson.empty(), 
+                       sort = mongo.bson.empty(), 
+                       fields = mongo.bson.empty(), 
+                       limit = 0L, skip = 0L, options = 0L) {
   
   #check for mongodb connection
   if( !mongo.is.connected(mongo))
@@ -367,10 +367,10 @@ mongo.find <- function(mongo, ns,
 #' @export mongo.find.batch
 #' @export mongo.find.all
 mongo.find.all <- function(mongo, ns, 
-                           query=mongo.bson.empty(), sort=mongo.bson.empty(), 
-                           fields=mongo.bson.empty(), limit=0L, skip=0L,
-                           options=0L,
-                           data.frame=FALSE, mongo.oid2character = TRUE, ...) {
+                           query = mongo.bson.empty(), sort = mongo.bson.empty(), 
+                           fields = mongo.bson.empty(), limit = 0L, skip = 0L,
+                           options = 0L,
+                           data.frame = FALSE, mongo.oid2character = TRUE, ...) {
   
   #check for mongodb connection
   if( !mongo.is.connected(mongo))
@@ -379,21 +379,15 @@ mongo.find.all <- function(mongo, ns,
   if(data.frame==T & mongo.oid2character == F)
     warning("You won't get correct id in your data.frame if you don't set mongo.oid2character to TRUE")
   
-  cursor <- mongo.find(mongo, ns, query=query, sort=sort, fields=fields, limit=limit, skip=skip, options=options)
+  cursor <- mongo.find(mongo, ns, query = query, sort = sort, fields = fields, limit = limit, skip = skip, options = options)
   
   # Step though the matching records
-  idx <- 1
-  temp <- list()
-  
-  while (mongo.cursor.next(cursor)){
-    temp[[idx]] <- mongo.bson.to.list(mongo.cursor.value(cursor))
-    idx <- idx+1
-  }
+  temp <- mongo.cursor.to.rlist(cursor, ...)
   
   if(mongo.oid2character){
-    temp <- lapply(temp,function(x) {
-      lapply(x,function(y){
-        if(class(y)[1]=="mongo.oid")
+    temp <- lapply(temp, function(x) {
+      lapply(x, function(y){
+        if(inherits(y, "mongo.oid"))
           as.character.mongo.oid(y)
         else
           y
@@ -406,11 +400,11 @@ mongo.find.all <- function(mongo, ns,
   
   if(data.frame){
     
-    temp <- do.call(rbind, lapply(temp, function(x) data.frame(x,stringsAsFactors=F)) )
+    temp <- do.call(rbind, lapply(temp, function(x) data.frame(x, stringsAsFactors = F)) )
     
     if(!is.null(temp)) {
       colnames <- colnames(temp)
-      select <- (colnames=="X_id")
+      select <- (colnames == "X_id")
       colnames[select] <- "_id"
       colnames(temp) <- colnames
     }

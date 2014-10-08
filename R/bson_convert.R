@@ -123,19 +123,27 @@ mongo.bson.to.Robject <- function(b)
 #' 
 #' 
 #' @param b (\link{mongo.bson}) The mongo.bson object to convert.
-#' @param simplify logical (default: FALSE); should the result be simplified to a vector, matrix 
+#' @param simplify DEPRECIATED PARAMETER - it is kept to provide compatibility with previous behavior. 
+#' \link{logical} (default: FALSE); should the result be simplified to a vector, matrix 
 #' or higher dimensional array if possible?
 #' @return an R object of the type list
 #' @seealso \code{\link{mongo.bson.from.list}}, \code{\link{mongo.bson.to.Robject}},\cr \link{mongo.bson}.
+#' @note Now arrays in bson document are 1) converted into unnamed lists 2) they are converted WITHOUT any SIMPLIFYING!
+#' If you need old behavior, please use this function with simplify = TRUE;
+#' Please see examples below;
+#'
 #' @examples
-#' 
-#' l <- list(num=1:3, bool=c(TRUE, FALSE), str="blabla", nul=NULL)
+#' # arrays will be converted into unnamed lists without any symplifying:
+#' l <- list(storageArray = list(list(key = 'value_1'), list(key = 'value_2')))
+#' # Here we construct bson of form {'storageArray':[{'key':'value_1'}, {'key':'value_2'}]}
 #' b <- mongo.bson.from.list(l)
-#' print(mongo.bson.to.list(b))
-#' print(mongo.bson.to.list(b, simplify=FALSE))
+#' # old behavior
+#' print(mongo.bson.to.list(b, simplify = TRUE))
+#' # current behavior
+#' print(mongo.bson.to.list(b, simplify = FALSE))
 #' 
 #' @export mongo.bson.to.list
-mongo.bson.to.list <- function(b, simplify = TRUE){
+mongo.bson.to.list <- function(b, simplify = FALSE) {
   if(isTRUE(simplify)){
     # This is the old behavior implemented by Gerald
     as.list(.Call(".mongo.bson.to.list", b))
@@ -146,27 +154,24 @@ mongo.bson.to.list <- function(b, simplify = TRUE){
 }
 
 
-
-
 #' Convert a list to a mongo.bson object
 #' 
 #' Convert a list to a \link{mongo.bson} object.
 #' 
 #' This function permits the simple and convenient creation of a mongo.bson
-#' object.  This bypasses the creation of a \link{mongo.bson.buffer}, appending
+#' object. This bypasses the creation of a \link{mongo.bson.buffer}, appending
 #' fields one by one, and then turning the buffer into a mongo.bson object with
 #' \code{\link{mongo.bson.from.buffer}()}.
 #' 
-#' Note that this function and \code{\link{mongo.bson.to.list}()} do not always
-#' perform inverse conversions since mongo.bson.to.list() will convert objects
-#' and subobjects to atomic vectors if possible.
-#' 
+#' Note that this function and \code{\link{mongo.bson.to.list}()} perform inverse conversions.
 #' 
 #' @param lst (list) The list to convert.
 #' 
 #' This \emph{must} be a list, \emph{not} a vector of atomic types; otherwise,
 #' an error is thrown; use \code{as.list()} as necessary.
 #' @return (\link{mongo.bson}) A mongo.bson object serialized from \code{lst}.
+#' @note Function converts unnamed R lists into bson arrays. 
+#' It is very easy to construct bson object of any form using this function and list.
 #' @seealso \code{\link{mongo.bson.to.list}},\cr \link{mongo.bson},\cr
 #' \code{\link{mongo.bson.destroy}}.
 #' @examples
@@ -182,7 +187,11 @@ mongo.bson.to.list <- function(b, simplify = TRUE){
 #' b <- mongo.bson.from.list(as.list(v))
 #' # the above produces a BSON object of the form:
 #' # { "president" : "Jefferson", "vice" : "Burr" }
-#' 
+#' # Let's try to construct bson with array.
+#' # This one
+#' mongo.bson.from.list(list(fruits = list('apple', 'banana', 'orange')))
+#' # will produce a BSON object of the form:
+#' # {"fruits" : ["apple", "banana", "orange"]}
 #' @export mongo.bson.from.list
 mongo.bson.from.list <- function(lst){
   if(length(lst)){
