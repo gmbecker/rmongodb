@@ -40,19 +40,15 @@ SEXP ConvertValue(bson_iterator* iter){
             bson_iterator_subobject(iter, &sub);
             return ConvertObject(&sub, true);
         case BSON_BINDATA: 
-            // call _raw_create helper function from api_bson.c
-            return _raw_create( bson_iterator_bin_type(iter),
-                                bson_iterator_bin_data(iter),
-                                bson_iterator_bin_len(iter));
+        case BSON_OID:            
         case BSON_NULL:
         case BSON_TIMESTAMP:
-        case BSON_OID:
         case BSON_REGEX:
         case BSON_UNDEFINED:
         case BSON_SYMBOL:
         case BSON_CODEWSCOPE:
         case BSON_CODE:
-            return R_NilValue;
+            return _mongo_bson_value(iter);
         default:
             error("Unhandled BSON type %d\n", sub_type);
     }
