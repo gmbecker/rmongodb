@@ -133,9 +133,17 @@ mongo.index.create <- function(mongo, ns, key, options=0L) {
 #' 
 #' @param mongo (\link{mongo}) A mongo connection object.
 #' @param ns (string) The namespace of the collection to add a TTL index to.
-#' @param field (string) The desired field to use as the basis for expiration time. The field should be of type 'Date'
-#' @param index_name (string) The name of the index to be created.
+#' @param key (\link{mongo.bson}) The desired field(s) to use as the basis for expiration time. The field should be of type 'Date'.
+#' 
+#' Alternately, \code{key} may be a list which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+#' 
+#' Alternately, \code{key} may be a valid JSON character string which will be converted to a
+#' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
+#' 
 #' @param expireAfterSeconds (Numeric or Integer) The time in seconds after which records should be removed.
+#' 
+#' @param index_name (string) The name of the index to be created.
 #' 
 #' @return NULL if the command failed.  \code{\link{mongo.get.err}()} may be
 #' MONGO_COMMAND_FAILED.
@@ -143,26 +151,40 @@ mongo.index.create <- function(mongo, ns, key, options=0L) {
 #' (\link{mongo.bson}) The server's response if successful.
 #' 
 #' @seealso \code{\link{mongo.index.create}}
-#' 
+#' @examples
+#' mongo <- mongo.create()
+#' if (mongo.is.connected(mongo)) {
+#'  for (i in 1:10) mongo.insert(mongo, ns = 'test.testTTL', b = list(a = i,  last_updated = i))
+#'  res_bson <- mongo.index.TTLcreate (mongo, ns = 'test.testTTL', key = list(last_updated = 1), expireAfterSeconds = 3600, index_name = 'last_updated_1')
+#'  print(res_bson);
+#'  mongo.drop(mongo, ns = 'test.testTTL')
+#' }
+#' mongo.destroy(mongo);
 #' @export mongo.index.TTLcreate
-mongo.index.TTLcreate <- function(mongo, ns, field, index_name, expireAfterSeconds) {
-  
+mongo.index.TTLcreate <- function(mongo, ns, key, expireAfterSeconds, index_name = NULL) {
+  #parse ns into db and collection names
+  ns_parsed <- mongo.parse.ns(ns)
   #check for mongodb connection
   if( !mongo.is.connected(mongo))
     stop("No mongoDB connection!")
+  key_list <- switch( class(key),
+                      "list" = key,
+                      "mongo.bson" = mongo.bson.to.list(key),
+                      "character" = {  
+                        if( !validate(I(key)) ) stop("Not a valid JSON content: ", key)
+                        else fromJSON(key)},
+                      stop("key parameter can be only one of 'character'(represents JSON), 'list' or 'bson'\n")
+  )
+  if(!is.character(index_name)) index_name <- paste(names(unlist(key_list)), collapse = '.')
   
-  indexes = list()
-  key=list()
-  key[[field]] <- 1L
-  
+  indexes = list()  
   indexes[["name"]] <- index_name
   indexes[["expireAfterSeconds"]] <- expireAfterSeconds
-  indexes[["key"]] <- key
+  indexes[["key"]] <- key_list
   
-  
-  listCreateIndex <- list(    createIndexes = sub(".*\\.", "", ns), indexes = list(indexes)  )                 
-  
+  listCreateIndex <- list(createIndexes = ns_parsed$collection, indexes = list(indexes))
   bsonCreateIndex <- mongo.bson.from.list(listCreateIndex)
-  mongo.command(mongo, db = gsub("\\..*","",ns), bsonCreateIndex)
-  
+  res <- mongo.command(mongo, db = ns_parsed$db, bsonCreateIndex)
+  if(is.null(res)) warning("Probably index was not created (syntax error), try to see last error: mongo.get.err(), mongo.get.last.err()");
+  return(res);
 }
