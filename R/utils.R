@@ -10,3 +10,11 @@ mongo.parse.ns <- function(ns)
     return(list(db=db, collection=collection))
   }
 }
+
+# make flat list without type coercion
+flatten <- function(lst) {
+  lst[['__dummy']] <- function() NULL
+  lst <- unlist(lst)
+  lst$`__dummy` <- NULL
+  lst
+}
