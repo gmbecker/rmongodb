@@ -3,14 +3,13 @@
 \alias{mongo.bson.to.list}
 \title{Convert a mongo.bson object to an R list object.}
 \usage{
-mongo.bson.to.list(b, simplify = FALSE)
+mongo.bson.to.list(b, simplify = TRUE)
 }
 \arguments{
 \item{b}{(\link{mongo.bson}) The mongo.bson object to convert.}
 
-\item{simplify}{DEPRECIATED PARAMETER - it is kept to provide compatibility with previous behavior.
-\link{logical} (default: FALSE); should the result be simplified to a vector, matrix
-or higher dimensional array if possible?}
+\item{simplify}{\link{logical} (default: TRUE); should the bson arrays be simplified to a vectors if possible?
+If types of values in bson array are heterogeneous or non-primitive, array will be converted into list.}
 }
 \value{
 an R object of the type list
@@ -19,19 +18,23 @@ an R object of the type list
 Convert a \link{mongo.bson} object to an R list object.
 }
 \note{
-Now arrays in bson document are 1) converted into unnamed lists 2) they are converted WITHOUT any SIMPLIFYING!
-If you need old behavior, please use this function with simplify = TRUE;
+Now arrays in bson document are 1) converted into unnamed lists 2) If simplify == TRUE,  function tries
+to turn arrays of primitive types into R vectors.
 Please see examples below;
 }
 \examples{
 # arrays will be converted into unnamed lists without any symplifying:
-l <- list(storageArray = list(list(key = 'value_1'), list(key = 'value_2')))
-# Here we construct bson of form {'storageArray':[{'key':'value_1'}, {'key':'value_2'}]}
+l <- list(storageArray = list('value_1', 'value_2'))
+# Here we construct bson of form {'storageArray':['value_1''value_2']}
 b <- mongo.bson.from.list(l)
-# old behavior
+# simplify
 print(mongo.bson.to.list(b, simplify = TRUE))
-# current behavior
+# not simplify
 print(mongo.bson.to.list(b, simplify = FALSE))
+# heterogeneous types of array values
+print(mongo.bson.to.list(mongo.bson.from.list(list(x = list('a', 1))), simplify = T))
+# identical to call with simplify = F
+print(mongo.bson.to.list(mongo.bson.from.list(list(x = list('a', 1))), simplify = F))
 }
 \seealso{
 \code{\link{mongo.bson.from.list}}, \code{\link{mongo.bson.to.Robject}},\cr \link{mongo.bson}.

@@ -1,5 +1,5 @@
-/* Reduced code to convert BSON to R list without any type conversion maddness. Jeroen Ooms (2014) */
-
+/* Reduced code to convert BSON to R list without any type conversion maddness. Jeroen Ooms (2014) - https://github.com/jeroenooms */
+/* Added code for simplifying arrays. Dmitriy Selivanov (2014) https://github.com/dselivanov */
 #include <R.h>
 #include "api_bson.h"
 #include "utility.h"
@@ -7,18 +7,18 @@
 
 typedef bson bson_buffer;
 
-SEXP ConvertValue(bson_iterator* iter);
-SEXP ConvertObject(bson* b);
-SEXP R_ConvertObject(SEXP x);
-SEXP ConvertArray(bson* b);
+SEXP ConvertValue(bson_iterator* iter, bool simplify);
+SEXP ConvertObject(bson* b, bool is_namedlist, bool simplify);
+SEXP R_ConvertObject(SEXP x, SEXP simplify);
+SEXP ConvertArray(bson* b, bool simplify);
 
-SEXP R_ConvertObject(SEXP x) {
-    bson* b = _checkBSON(x);
-    return ConvertObject(b);
+SEXP R_ConvertObject(SEXP x, SEXP simplify) {
+  bson* b = _checkBSON(x);
+  return ConvertObject(b, true, (asLogical(simplify) == 1));
 }
 
 
-SEXP ConvertValue(bson_iterator* iter){
+SEXP ConvertValue(bson_iterator* iter, bool simplify){
     bson sub;
     SEXP ret;
     bson_type sub_type = bson_iterator_type(iter);
@@ -44,12 +44,13 @@ SEXP ConvertValue(bson_iterator* iter){
             return ret;
         case BSON_ARRAY:
             bson_iterator_subobject(iter, &sub);
-            return ConvertArray(&sub);
+            if(simplify) return ConvertArray(&sub, simplify);
+            else return(ConvertObject(&sub, false, simplify));
         case BSON_OBJECT:
             bson_iterator_subobject(iter, &sub);
-            return ConvertObject(&sub);
+            return ConvertObject(&sub, true, simplify);
         case BSON_BINDATA: 
-        case BSON_OID:            
+        case BSON_OID:
         case BSON_NULL:
         case BSON_TIMESTAMP:
         case BSON_REGEX:
@@ -57,13 +58,13 @@ SEXP ConvertValue(bson_iterator* iter){
         case BSON_SYMBOL:
         case BSON_CODEWSCOPE:
         case BSON_CODE:
-            return _mongo_bson_value(iter);
+          return _mongo_bson_value(iter);
         default:
             error("Unhandled BSON type %d\n", sub_type);
     }
 }
 
-SEXP ConvertObject(bson* b) {
+SEXP ConvertObject(bson* b, bool is_namedlist, bool simplify) {
     SEXP names, ret;
     bson_iterator iter;
     bson_type sub_type;
@@ -75,22 +76,23 @@ SEXP ConvertObject(bson* b) {
       count++;
     }
     
-    //reset iterator  
+    //reset iterator
     bson_iterator_init(&iter, b);
     PROTECT(ret = allocVector(VECSXP, count));
-    PROTECT(names = allocVector(STRSXP, count));      
+    PROTECT(names = allocVector(STRSXP, count));
     for (int i = 0; (sub_type = bson_iterator_next(&iter)); i++) {
         SET_STRING_ELT(names, i, mkChar(bson_iterator_key(&iter)));
-        SET_VECTOR_ELT(ret, i, ConvertValue(&iter));
+        SET_VECTOR_ELT(ret, i, ConvertValue(&iter, simplify));
     }
-    // set names
-    setAttrib(ret, R_NamesSymbol, names);      
-
+    //only add names for BSON object
+    if(is_namedlist) {
+      setAttrib(ret, R_NamesSymbol, names);
+    }
     UNPROTECT(2);
     return ret;
 }
 
-SEXP ConvertArray(bson* b) {
+SEXP ConvertArray(bson* b, bool simplify) {
     SEXP ret;
     bson_iterator iter;
     bson_type sub_type;
@@ -101,7 +103,7 @@ SEXP ConvertArray(bson* b) {
     // iterate over array to get size
     // First,  we assume array is plain vanilla. 
     // If it will array of complex elements, we will change FLAG_plain_vanilla_array
-    int FLAG_plain_vanilla_array = 1;
+    bool FLAG_plain_vanilla_array = simplify;
     bson_iterator_init(&iter, b);
     while(sub_type = bson_iterator_next(&iter)) {
       count++;
@@ -119,11 +121,11 @@ SEXP ConvertArray(bson* b) {
             break;
           default:
           // if type of any element is not simple primitive, we will **create list** instead of array;
-            FLAG_plain_vanilla_array = 0;
+            FLAG_plain_vanilla_array = false;
         }
         // Also we will **create list** instead of array if values in array are have simple, BUT diffrent types
         if((previous_element_sub_type != sub_type) && (count > 1)) {
-          FLAG_plain_vanilla_array = 0;
+          FLAG_plain_vanilla_array = false;
         }
         // store previous element type;
         previous_element_sub_type = sub_type;
@@ -133,10 +135,10 @@ SEXP ConvertArray(bson* b) {
     bson_iterator_init(&iter, b);
     int i = 0;
     // for array of complex objects create list
-    if(FLAG_plain_vanilla_array == 0) {
+    if(!FLAG_plain_vanilla_array) {
       PROTECT(ret = allocVector(VECSXP, count));
       while(bson_iterator_next(&iter)) {
-          SET_VECTOR_ELT(ret, i++, ConvertValue(&iter));
+          SET_VECTOR_ELT(ret, i++, ConvertValue(&iter, simplify));
       }
     }
     // for primitive types construct plain array
@@ -188,7 +190,7 @@ SEXP ConvertArray(bson* b) {
         default:
           PROTECT(ret = allocVector(VECSXP, count));
           while(bson_iterator_next(&iter))
-              SET_VECTOR_ELT(ret, i++, ConvertValue(&iter));
+              SET_VECTOR_ELT(ret, i++, ConvertValue(&iter, simplify));
           break;
       }
     }
