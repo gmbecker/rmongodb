@@ -226,15 +226,6 @@ mongo.bson.from.df <- function(df){
 
   data_list <- vector("list", nrow(df))
   for( i in 1:nrow(df) ) data_list[[i]] <- as.list(df[i, ])
-
-
-
-  # Convert any numbers saved as string to numeric adata
-  data_list <- lapply(data_list,function(x) { lapply(x,function(y) {
-    if ( suppressWarnings(!is.na(as.numeric(y))) & !is.integer(y) & !(class(y)[1]=="POSIXct") ) {as.numeric(y)}else{y}
-  })
-  })
-
   # Iterate over the table and create the BSON object
   bson_data <- lapply(data_list,function(x){
     idx <- 1
