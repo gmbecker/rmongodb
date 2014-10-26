@@ -3,7 +3,8 @@
 \alias{mongo.aggregation}
 \title{Aggregation pipeline}
 \usage{
-mongo.aggregation(mongo, ns, aggr_cmd_list)
+mongo.aggregation(mongo, ns, pipeline, explain = NULL, allowDiskUse = NULL,
+  cursor = NULL, ...)
 }
 \arguments{
 \item{mongo}{(\link{mongo}) A mongo connection object.}
@@ -11,7 +12,23 @@ mongo.aggregation(mongo, ns, aggr_cmd_list)
 \item{ns}{(string) The namespace of the collection in which to find distinct
 keys.}
 
-\item{aggr_cmd_list}{\link{mongo.bson} An list representing aggregation query pipeline.}
+\item{pipeline}{\link{mongo.bson}\link{list} An **list** representing aggregation query pipeline.
+Alternately, \code{pipeline} may be a list of list which will be converted to a mongo.bson list object by
+\code{\link{mongo.bson.from.list}()}.
+
+Alternately, \code{pipeline} may be a list of valid JSON character strings which will be converted to a
+mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.}
+
+\item{explain}{\link{logical} Optional, MongoDB 2.6+. Specifies to return the information on the processing of the pipeline. References above.}
+
+\item{cursor}{\link{mongo.bson} Optional, MongoDB 2.6+. Specify a document that contains options that control the creation of the cursor object.
+
+Alternately, \code{query} may be a list which will be converted to a
+mongo.bson object by \code{\link{mongo.bson.from.list}()}.
+
+Alternately, \code{query} may be a valid JSON character string which will be converted to mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.}
+
+\item{\link{logical}}{Optional, MongoDB 2.6+. Enables writing to temporary files. When set to true, aggregation stages can write data to the _tmp subdirectory in the dbPath directory.}
 }
 \value{
 NULL if the command failed.  \code{\link{mongo.get.err}()} may be
@@ -24,6 +41,7 @@ Aggregation pipeline
 }
 \details{
 See
+\url{http://docs.mongodb.org/manual/reference/command/aggregate/}
 \url{http://docs.mongodb.org/manual/core/aggregation-pipeline/}.
 }
 \examples{
