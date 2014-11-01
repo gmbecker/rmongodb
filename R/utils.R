@@ -37,6 +37,6 @@ mongo.list.from.argument <- function(arg, simplify = T) {
 flatten <- function(lst) {
   lst[['__dummy']] <- function() NULL
   lst <- unlist(lst)
-  lst$`__dummy` <- NULL
+  lst[['__dummy']] <- NULL
   lst
 }

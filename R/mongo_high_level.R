@@ -79,6 +79,7 @@ mongo.get.values <- mongo.distinct
 #' @param explain (\link{logical}) Optional, MongoDB 2.6+. Specifies to return the information on the processing of the pipeline. References above.
 #' @param (\link{logical}) Optional, MongoDB 2.6+. Enables writing to temporary files. When set to true, aggregation stages can write data to the _tmp subdirectory in the dbPath directory.
 #' @param cursor (\link{mongo.bson}) Optional, MongoDB 2.6+. Specify a document that contains options that control the creation of the cursor object.
+#' Unfortunately, current underlying mongo-c-driver can return BSON from aggreagation camand. Cursors are not supported.
 #'
 #' Alternately, \code{cursor} may be a list which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.list}()}.

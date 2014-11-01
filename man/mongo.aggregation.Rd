@@ -12,23 +12,24 @@ mongo.aggregation(mongo, ns, pipeline, explain = NULL, allowDiskUse = NULL,
 \item{ns}{(string) The namespace of the collection in which to find distinct
 keys.}
 
-\item{pipeline}{\link{mongo.bson}\link{list} An **list** representing aggregation query pipeline.
-Alternately, \code{pipeline} may be a list of list which will be converted to a mongo.bson list object by
+\item{pipeline}{(\link{list} of \link{mongo.bson} objects) representing aggregation query pipeline.
+Alternately, \code{pipeline} may be a \link{list} of \link{list} which will be converted to a mongo.bson list object by
 \code{\link{mongo.bson.from.list}()}.
 
-Alternately, \code{pipeline} may be a list of valid JSON character strings which will be converted to a
+Alternately, \code{pipeline} may be a \link{list} of valid JSON \link{character} strings which will be converted to a
 mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.}
 
-\item{explain}{\link{logical} Optional, MongoDB 2.6+. Specifies to return the information on the processing of the pipeline. References above.}
+\item{explain}{(\link{logical}) Optional, MongoDB 2.6+. Specifies to return the information on the processing of the pipeline. References above.}
 
-\item{cursor}{\link{mongo.bson} Optional, MongoDB 2.6+. Specify a document that contains options that control the creation of the cursor object.
+\item{cursor}{(\link{mongo.bson}) Optional, MongoDB 2.6+. Specify a document that contains options that control the creation of the cursor object.
+Unfortunately, current underlying mongo-c-driver can return BSON from aggreagation camand. Cursors are not supported.
 
-Alternately, \code{query} may be a list which will be converted to a
+Alternately, \code{cursor} may be a list which will be converted to a
 mongo.bson object by \code{\link{mongo.bson.from.list}()}.
 
-Alternately, \code{query} may be a valid JSON character string which will be converted to mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.}
+Alternately, \code{cursor} may be a valid JSON character string which will be converted to mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.}
 
-\item{\link{logical}}{Optional, MongoDB 2.6+. Enables writing to temporary files. When set to true, aggregation stages can write data to the _tmp subdirectory in the dbPath directory.}
+\item{(\link{logical})}{Optional, MongoDB 2.6+. Enables writing to temporary files. When set to true, aggregation stages can write data to the _tmp subdirectory in the dbPath directory.}
 }
 \value{
 NULL if the command failed.  \code{\link{mongo.get.err}()} may be
