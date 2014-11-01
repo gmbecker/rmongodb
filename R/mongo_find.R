@@ -365,7 +365,7 @@ mongo.find.all <- function(mongo, ns,
   cursor <- mongo.find(mongo, ns, query = query, sort = sort, fields = fields, limit = limit, skip = skip, options = options)
 
   # Step though the matching records
-  temp <- mongo.cursor.to.rlist(cursor, ...)
+  temp <- mongo.cursor.to.list(cursor, ...)
 
   if(mongo.oid2character){
     temp <- lapply(temp, function(x) {
