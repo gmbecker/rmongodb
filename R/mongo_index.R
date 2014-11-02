@@ -155,7 +155,8 @@ mongo.index.create <- function(mongo, ns, key, options=0L) {
 #' mongo <- mongo.create()
 #' if (mongo.is.connected(mongo)) {
 #'  for (i in 1:10) mongo.insert(mongo, ns = 'test.testTTL', b = list(a = i,  last_updated = i))
-#'  res_bson <- mongo.index.TTLcreate (mongo, ns = 'test.testTTL', key = list(last_updated = 1), expireAfterSeconds = 3600, index_name = 'last_updated_1')
+#'  res_bson <- mongo.index.TTLcreate (mongo, ns = 'test.testTTL', key = list(last_updated = 1),
+#'                                      expireAfterSeconds = 3600, index_name = 'last_updated_1')
 #'  print(res_bson);
 #'  mongo.drop(mongo, ns = 'test.testTTL')
 #' }

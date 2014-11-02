@@ -21,15 +21,17 @@ mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.}
 
 \item{explain}{(\link{logical}) Optional, MongoDB 2.6+. Specifies to return the information on the processing of the pipeline. References above.}
 
-\item{cursor}{(\link{mongo.bson}) Optional, MongoDB 2.6+. Specify a document that contains options that control the creation of the cursor object.
+\item{allowDiskUse}{(\link{logical}) Optional, MongoDB 2.6+. Enables writing to temporary files. When set to true, aggregation stages can write data to the _tmp subdirectory in the dbPath directory.}
+
+\item{cursor}{(\link{mongo.bson}) Optional, MongoDB 2.6+. Specify a document that contains options that control the creation of the cursor object.}
+
+\item{...}{Arguments to be passed to methods, such as \link{mongo.bson.to.list}, \link{fromJSON}
 Unfortunately, current underlying mongo-c-driver can return BSON from aggreagation camand. Cursors are not supported.
 
 Alternately, \code{cursor} may be a list which will be converted to a
 mongo.bson object by \code{\link{mongo.bson.from.list}()}.
 
 Alternately, \code{cursor} may be a valid JSON character string which will be converted to mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.}
-
-\item{(\link{logical})}{Optional, MongoDB 2.6+. Enables writing to temporary files. When set to true, aggregation stages can write data to the _tmp subdirectory in the dbPath directory.}
 }
 \value{
 NULL if the command failed.  \code{\link{mongo.get.err}()} may be
