@@ -32,9 +32,9 @@ print(mongo.bson.to.list(b, simplify = TRUE))
 # not simplify
 print(mongo.bson.to.list(b, simplify = FALSE))
 # heterogeneous types of array values
-print(mongo.bson.to.list(mongo.bson.from.list(list(x = list('a', 1))), simplify = T))
+print(mongo.bson.to.list(mongo.bson.from.list(list(x = list('a', 1))), simplify = TRUE))
 # identical to call with simplify = F
-print(mongo.bson.to.list(mongo.bson.from.list(list(x = list('a', 1))), simplify = F))
+print(mongo.bson.to.list(mongo.bson.from.list(list(x = list('a', 1))), simplify = FALSE))
 }
 \seealso{
 \code{\link{mongo.bson.from.list}}, \code{\link{mongo.bson.to.Robject}},\cr \link{mongo.bson}.
