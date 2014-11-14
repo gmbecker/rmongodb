@@ -818,7 +818,7 @@ SEXP _get_R_object(bson* b) {
 }
 
 
-SEXP _mongo_bson_to_list(bson* b) { 
+SEXP _mongo_bson_to_list(bson* b) {
     SEXP names, ret;
     ret = _get_R_object(b);
     if (ret != R_NilValue)
@@ -918,9 +918,9 @@ SEXP _mongo_bson_to_list(bson* b) {
         UNPROTECT(2);
         return ret;
     }
-    
+
     PROTECT(ret = allocVector(VECSXP, count));
-    while(sub_type = bson_iterator_next(&iter)) {
+    while((sub_type = bson_iterator_next(&iter))) {
         SET_STRING_ELT(names, i, mkChar(bson_iterator_key(&iter)));
         SET_VECTOR_ELT(ret, i++, _mongo_bson_value(&iter));
     }
@@ -1013,7 +1013,7 @@ SEXP mongo_oid_print(SEXP oid) {
 
 
 SEXP mongo_bson_buffer_append_int(SEXP buf, SEXP name, SEXP value) {
-    bson_buffer* _buf = _checkBuffer(buf);    
+    bson_buffer* _buf = _checkBuffer(buf);
     SEXP ret;
     PROTECT(ret = allocVector(LGLSXP, 1));
     const char* _name = CHAR(STRING_ELT(name, 0));
@@ -1037,7 +1037,7 @@ SEXP mongo_bson_buffer_append_int(SEXP buf, SEXP name, SEXP value) {
                     depth++;
                     success = (bson_append_start_array(_buf, _name) == BSON_OK);
                 }
-                else {                  
+                else {
                   if(is_na[i]) {
                     success = (bson_append_null_old( _buf, _name ) == BSON_OK);
                     i++;
@@ -1085,7 +1085,7 @@ SEXP mongo_bson_buffer_append_int(SEXP buf, SEXP name, SEXP value) {
                 for (i = 0; i < len && success; i++) {
                   if(is_na[i]) {
                     success &= (bson_append_null_old( _buf, CHAR(STRING_ELT(names, i)) ) == BSON_OK);
-                  } else                  
+                  } else
                   success &= (bson_append_int(_buf, CHAR(STRING_ELT(names, i)), INTEGER(value)[i]) == BSON_OK);
                 }
             }
@@ -1105,7 +1105,7 @@ SEXP mongo_bson_buffer_append_bool(SEXP buf, SEXP name, SEXP value) {
     PROTECT(ret = allocVector(LGLSXP, 1));
     const char* _name = CHAR(STRING_ELT(name, 0));
     int success = 1;
-    int* is_na = _IS_NA(value);    
+    int* is_na = _IS_NA(value);
     int len = LENGTH(value);
     SEXP dim = getAttrib(value, R_DimSymbol);
     int dims;
@@ -1153,7 +1153,7 @@ SEXP mongo_bson_buffer_append_bool(SEXP buf, SEXP name, SEXP value) {
                 for (i = 0; i < len && success; i++) {
                   if(is_na[i]) {
                     success &= (bson_append_null_old( _buf, numstr(i) ) == BSON_OK);
-                  } else                  
+                  } else
                     success &= (bson_append_bool_old(_buf, numstr(i), LOGICAL(value)[i]) == BSON_OK);
                 }
                 success &= (bson_append_finish_object(_buf) == BSON_OK);
@@ -1171,7 +1171,7 @@ SEXP mongo_bson_buffer_append_bool(SEXP buf, SEXP name, SEXP value) {
                 for (i = 0; i < len && success; i++) {
                   if(is_na[i]) {
                     success &= (bson_append_null_old( _buf, CHAR(STRING_ELT(names, i)) ) == BSON_OK);
-                  } else                  
+                  } else
                     success &= (bson_append_bool_old(_buf, CHAR(STRING_ELT(names, i)), LOGICAL(value)[i]) == BSON_OK);
                 }
             }
@@ -1210,13 +1210,13 @@ SEXP mongo_bson_buffer_append_double(SEXP buf, SEXP name, SEXP value) {
                     depth++;
                     success = (bson_append_start_array(_buf, _name) == BSON_OK);
                 }
-                else {                  
+                else {
                   if(is_na[i]) {
                     success = (bson_append_null_old( _buf, _name ) == BSON_OK);
                     i++;
                   } else
                     success = (bson_append_double_old(_buf, _name, REAL(value)[i++]) == BSON_OK);
-                }                    
+                }
             }
             else {
                 ijk[depth] = 0;
@@ -1242,7 +1242,7 @@ SEXP mongo_bson_buffer_append_double(SEXP buf, SEXP name, SEXP value) {
                     success &= (bson_append_null_old( _buf, numstr(i) ) == BSON_OK);
                   } else
                     success &= (bson_append_double_old(_buf, numstr(i), REAL(value)[i]) == BSON_OK);
-                }                
+                }
                 success &= (bson_append_finish_object(_buf) == BSON_OK);
             }
         else {
@@ -1252,13 +1252,13 @@ SEXP mongo_bson_buffer_append_double(SEXP buf, SEXP name, SEXP value) {
                     success &= (bson_append_null_old( _buf, _name ) == BSON_OK);
                 } else
                     success &= (bson_append_double_old(_buf, _name, asReal(value)) == BSON_OK);
-            }            
+            }
             else {
                 int i;
                 for (i = 0; i < len && success; i++) {
                   if(is_na[i]) {
                     success &= (bson_append_null_old( _buf, CHAR(STRING_ELT(names, i)) ) == BSON_OK);
-                  } else                  
+                  } else
                   success &= (bson_append_double_old(_buf, CHAR(STRING_ELT(names, i)), REAL(value)[i]) == BSON_OK);
                 }
                 success &= (bson_append_finish_object(_buf) == BSON_OK);
@@ -1365,13 +1365,13 @@ SEXP mongo_bson_buffer_append_string(SEXP buf, SEXP name, SEXP value) {
                     depth++;
                     success = (bson_append_start_array(_buf, _name) == BSON_OK);
                 }
-                else {                  
+                else {
                   if(is_na[i]) {
                     success = (bson_append_null_old( _buf, _name ) == BSON_OK);
                     i++;
                   } else
                     success = (bson_append_string(_buf, _name, CHAR(STRING_ELT(value, i++))) == BSON_OK);
-                }                
+                }
             }
             else {
                 ijk[depth] = 0;
@@ -1406,9 +1406,9 @@ SEXP mongo_bson_buffer_append_string(SEXP buf, SEXP name, SEXP value) {
             for (i = 0; i < len && success; i++) {
               if(is_na[i]) {
                 success &= (bson_append_null_old( _buf, CHAR(STRING_ELT(names, i)) ) == BSON_OK);
-              } else                  
+              } else
                 success &= (bson_append_string(_buf, CHAR(STRING_ELT(names, i)), CHAR(STRING_ELT(value,i))) == BSON_OK);
-            }            
+            }
             success &= (bson_append_finish_object(_buf) == BSON_OK);
         }
     }
