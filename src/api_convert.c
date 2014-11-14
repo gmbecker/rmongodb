@@ -49,7 +49,7 @@ SEXP ConvertValue(bson_iterator* iter, bool simplify){
         case BSON_OBJECT:
             bson_iterator_subobject(iter, &sub);
             return ConvertObject(&sub, true, simplify);
-        case BSON_BINDATA: 
+        case BSON_BINDATA:
         case BSON_OID:
         case BSON_NULL:
         case BSON_TIMESTAMP:
@@ -68,14 +68,14 @@ SEXP ConvertObject(bson* b, bool is_namedlist, bool simplify) {
     SEXP names, ret;
     bson_iterator iter;
     bson_type sub_type;
-    
+
     //iterate over array to get size
     int count = 0;
-    bson_iterator_init(&iter, b);    
+    bson_iterator_init(&iter, b);
     while(bson_iterator_next(&iter)){
       count++;
     }
-    
+
     //reset iterator
     bson_iterator_init(&iter, b);
     PROTECT(ret = allocVector(VECSXP, count));
@@ -97,15 +97,15 @@ SEXP ConvertArray(bson* b, bool simplify) {
     bson_iterator iter;
     bson_type sub_type;
     bson_type previous_element_sub_type = BSON_EOO;
-    bson_type array_type;
+    bson_type array_type = BSON_EOO;
     int count = 0;
-    bson_iterator_init(&iter, b);    
+    bson_iterator_init(&iter, b);
     // iterate over array to get size
-    // First,  we assume array is plain vanilla. 
+    // First,  we assume array is plain vanilla.
     // If it will array of complex elements, we will change FLAG_plain_vanilla_array
     bool FLAG_plain_vanilla_array = simplify;
     bson_iterator_init(&iter, b);
-    while(sub_type = bson_iterator_next(&iter)) {
+    while((sub_type = bson_iterator_next(&iter))) {
       count++;
       if(FLAG_plain_vanilla_array) {
         // array can contain only simple data types
@@ -117,7 +117,7 @@ SEXP ConvertArray(bson* b, bool simplify) {
           case BSON_BOOL: ;
           case BSON_DATE:
           // try to determine type of array. Set it to current element type;
-            array_type= sub_type;
+            array_type = sub_type;
             break;
           default:
           // if type of any element is not simple primitive, we will **create list** instead of array;
@@ -131,7 +131,7 @@ SEXP ConvertArray(bson* b, bool simplify) {
         previous_element_sub_type = sub_type;
       }
     }
-    //reset iterator  
+    //reset iterator
     bson_iterator_init(&iter, b);
     int i = 0;
     // for array of complex objects create list
@@ -155,7 +155,7 @@ SEXP ConvertArray(bson* b, bool simplify) {
           while(bson_iterator_next(&iter)) {
               REAL(ret)[i++] = bson_iterator_long(&iter);
           }
-          break;          
+          break;
         case BSON_DOUBLE:
           PROTECT(ret = allocVector(REALSXP, count));
           while(bson_iterator_next(&iter)) {
@@ -178,7 +178,7 @@ SEXP ConvertArray(bson* b, bool simplify) {
           PROTECT(ret = allocVector(REALSXP, count));
           while(bson_iterator_next(&iter)) {
               REAL(ret)[i++] = bson_iterator_date(&iter) / 1000;
-          }     
+          }
           SEXP cls;
           PROTECT(cls = allocVector(STRSXP, 2));
           SET_STRING_ELT(cls, 0, mkChar("POSIXct"));
