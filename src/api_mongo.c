@@ -250,7 +250,7 @@ SEXP rmongo_find_one(SEXP mongo_conn, SEXP ns, SEXP query, SEXP fields) {
         return R_NilValue;
     }
     SEXP ret = _mongo_bson_create(&out);
-    bson_destroy_old(&out);
+    bson_destroy(&out);
     UNPROTECT(3);
     return ret;
 }
@@ -280,7 +280,7 @@ SEXP rmongo_find(SEXP mongo_conn, SEXP ns, SEXP query, SEXP sort, SEXP fields, S
     bson sorted_query;
     if (_sort != NULL && bson_size(_sort) > 5) {
         q = &sorted_query;
-        bson_init_old(q);
+        bson_init(q);
         bson_append_bson(q, "$query", _query);
         bson_append_bson(q, "$orderby", _sort);
         bson_finish(q);
@@ -296,7 +296,7 @@ SEXP rmongo_find(SEXP mongo_conn, SEXP ns, SEXP query, SEXP sort, SEXP fields, S
         _options |= INTEGER(options)[i];
 
     mongo_cursor* cursor = mongo_find(conn, _ns, q, _fields, _limit, _skip, _options);
-    
+
     //null pointer means runtime error (e.g. out of memory)
     if(!cursor){
       bson out;
@@ -310,7 +310,7 @@ SEXP rmongo_find(SEXP mongo_conn, SEXP ns, SEXP query, SEXP sort, SEXP fields, S
     }
 
     if (q == &sorted_query)
-        bson_destroy_old(&sorted_query);
+        bson_destroy(&sorted_query);
 
     return _mongo_cursor_create(cursor);
 }
@@ -348,11 +348,17 @@ SEXP rmongo_cursor_destroy(SEXP cursor) {
 }
 
 
-SEXP mongo_index_create(SEXP mongo_conn, SEXP ns, SEXP key, SEXP options) {
+SEXP mongo_index_create(SEXP mongo_conn, SEXP ns, SEXP key, SEXP options, SEXP name, SEXP ttl) {
     mongo* conn = _checkMongo(mongo_conn);
     const char* _ns = CHAR(STRING_ELT(ns, 0));
     int _options = 0;
     int i;
+    int _ttl = asInteger(ttl);
+    const char* _name;
+    if(isNull(name))
+      _name = NULL;
+    else
+      _name = CHAR(STRING_ELT(name, 0));
     int len = LENGTH(options);
     for (i = 0; i < len; i++)
         _options |= INTEGER(options)[i];
@@ -364,21 +370,21 @@ SEXP mongo_index_create(SEXP mongo_conn, SEXP ns, SEXP key, SEXP options) {
     else {
         _key = &b;
         len = LENGTH(key);
-        bson_init_old(&b);
+        bson_init(&b);
         for (i = 0; i < len; i++)
             bson_append_int(&b, CHAR(STRING_ELT(key, i)), 1);
         bson_finish(&b);
     }
     bson out;
-    int success = mongo_create_index(conn, _ns, _key, _options, &out);
+    int success = mongo_create_index(conn, _ns, _key, _name, _options, _ttl, &out);
     if (!keyIsBSON)
-        bson_destroy_old(&b);
+        bson_destroy(&b);
     if (success == MONGO_OK) {
-        bson_destroy_old(&out);
+        bson_destroy(&out);
         return R_NilValue;
     }
     SEXP ret = _mongo_bson_create(&out);
-    bson_destroy_old(&out);
+    bson_destroy(&out);
     UNPROTECT(3);
     return ret;
 }
@@ -413,7 +419,7 @@ SEXP mongo_command(SEXP mongo_conn, SEXP db, SEXP command) {
         return R_NilValue;
     }
     SEXP ret = _mongo_bson_create(&out);
-    bson_destroy_old(&out);
+    bson_destroy(&out);
     UNPROTECT(3);
     return ret;
 }
@@ -430,11 +436,11 @@ SEXP mongo_simple_command(SEXP mongo_conn, SEXP db, SEXP cmdstr, SEXP arg) {
     else
         success = (mongo_simple_int_command(conn, _db, _cmdstr, asInteger(arg), &out) == MONGO_OK);
     if (!success) {
-        bson_destroy_old(&out);
+        bson_destroy(&out);
         return R_NilValue;
     }
     SEXP ret = _mongo_bson_create(&out);
-    bson_destroy_old(&out);
+    bson_destroy(&out);
     UNPROTECT(3);
     return ret;
 }
@@ -483,11 +489,11 @@ SEXP mongo_get_last_err(SEXP mongo_conn, SEXP db) {
     const char* _db = CHAR(STRING_ELT(db, 0));
     bson out;
     if (mongo_cmd_get_last_error(conn, _db, &out) == MONGO_OK) {
-        bson_destroy_old(&out);
+        bson_destroy(&out);
         return R_NilValue;
     }
     SEXP ret = _mongo_bson_create(&out);
-    bson_destroy_old(&out);
+    bson_destroy(&out);
     UNPROTECT(3);
     return ret;
 }
@@ -498,11 +504,11 @@ SEXP mongo_get_prev_err(SEXP mongo_conn, SEXP db) {
     const char* _db = CHAR(STRING_ELT(db, 0));
     bson out;
     if (mongo_cmd_get_prev_error(conn, _db, &out) == MONGO_OK) {
-        bson_destroy_old(&out);
+        bson_destroy(&out);
         return R_NilValue;
     }
     SEXP ret = _mongo_bson_create(&out);
-    bson_destroy_old(&out);
+    bson_destroy(&out);
     UNPROTECT(3);
     return ret;
 }
@@ -602,14 +608,14 @@ SEXP mongo_rename(SEXP mongo_conn, SEXP from_ns, SEXP to_ns) {
     const char* _from_ns = CHAR(STRING_ELT(from_ns, 0));
     const char* _to_ns = CHAR(STRING_ELT(to_ns, 0));
     bson cmd;
-    bson_init_old(&cmd);
+    bson_init(&cmd);
     bson_append_string(&cmd, "renameCollection", _from_ns);
     bson_append_string(&cmd, "to", _to_ns);
     bson_finish(&cmd);
     SEXP ret;
     PROTECT(ret = allocVector(LGLSXP, 1));
     LOGICAL(ret)[0] = (mongo_run_command(conn, "admin", &cmd, NULL) == MONGO_OK);
-    bson_destroy_old(&cmd);
+    bson_destroy(&cmd);
     UNPROTECT(1);
     return ret;
 }
@@ -619,7 +625,7 @@ SEXP mongo_get_databases(SEXP mongo_conn) {
     mongo* conn = _checkMongo(mongo_conn);
     bson out;
     if (mongo_simple_int_command(conn, "admin", "listDatabases", 1, &out) != MONGO_OK) {
-        bson_destroy_old(&out);
+        bson_destroy(&out);
         return R_NilValue;
     }
     bson_iterator it, databases, database;
@@ -645,7 +651,7 @@ SEXP mongo_get_databases(SEXP mongo_conn) {
         if (strcmp(name, "admin") != 0 && strcmp(name, "local") != 0)
             SET_STRING_ELT(ret, i++, mkChar(name));
     }
-    bson_destroy_old(&out);
+    bson_destroy(&out);
     UNPROTECT(1);
     return ret;
 }
@@ -659,7 +665,7 @@ SEXP mongo_get_database_collections(SEXP mongo_conn, SEXP db) {
     strcpy(ns, _db);
     strcpy(ns+len, ".system.namespaces");
     bson empty;
-    bson_empty(&empty);
+    bson_init_empty(&empty);
     mongo_cursor* cursor = mongo_find(conn, ns, NULL, &empty, 0, 0, 0);
     int count = 0;
     while (cursor && mongo_cursor_next(cursor) == MONGO_OK) {

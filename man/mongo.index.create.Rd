@@ -3,7 +3,7 @@
 \alias{mongo.index.create}
 \title{Add an index to a collection}
 \usage{
-mongo.index.create(mongo, ns, key, options = 0L)
+mongo.index.create(mongo, ns, key, options = 0L, name = NULL, ttl = -1L)
 }
 \arguments{
 \item{mongo}{(\link{mongo}) A mongo connection object.}
@@ -21,11 +21,15 @@ mongo.bson object by \code{\link{mongo.bson.from.list}()}.
 Alternately, \code{key} may be a valid JSON character string which will be converted to a
 mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.}
 
-\item{options}{(integer vector) Optional flags governing the operation:
+\item{options}{(integer vector) Optional flags governing the operation.
 \itemize{ \item\code{\link{mongo.index.unique}}
 \item\code{\link{mongo.index.drop.dups}}
 \item\code{\link{mongo.index.background}}
 \item\code{\link{mongo.index.sparse}} }}
+
+\item{name}{(character) = NULL. Optional index name.}
+
+\item{ttl}{(integer) = -1 (not remove data). Optional time to live parameter \url{http://docs.mongodb.org/manual/tutorial/expire-data/}.}
 }
 \value{
 NULL if successful; otherwise, a \link{mongo.bson} object describing

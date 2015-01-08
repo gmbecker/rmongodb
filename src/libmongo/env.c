@@ -22,28 +22,28 @@
 #include <string.h>
 
 #ifdef _MSC_VER
-#include <ws2tcpip.h>  /* send,recv,socklen_t etc */
-#include <wspiapi.h>   /* addrinfo */
+  #include <ws2tcpip.h>  /* send,recv,socklen_t etc */
+  #include <wspiapi.h>   /* addrinfo */
 #else
-#include <ws2tcpip.h>  /* send,recv,socklen_t etc */
-#include <winsock2.h>
-typedef int socklen_t;
+  #include <ws2tcpip.h>  /* send,recv,socklen_t etc */
+  #include <winsock2.h>
+  typedef int socklen_t;
 #endif
 
 #ifndef NI_MAXSERV
 # define NI_MAXSERV 32
 #endif
 
-int mongo_env_close_socket( int socket ) {
+int mongo_env_close_socket( SOCKET socket ) {
     return closesocket( socket );
 }
 
-int mongo_env_write_socket( mongo *conn, const void *buf, int len ) {
-    const char *cbuf = buf;
+int mongo_env_write_socket( mongo *conn, const void *buf, size_t len ) {
+    const char *cbuf = (const char*)buf;
     int flags = 0;
 
     while ( len ) {
-        int sent = send( conn->sock, cbuf, len, flags );
+        size_t sent = send( conn->sock, cbuf, len, flags );
         if ( sent == -1 ) {
             __mongo_set_error( conn, MONGO_IO_ERROR, NULL, WSAGetLastError() );
             conn->connected = 0;
@@ -56,11 +56,11 @@ int mongo_env_write_socket( mongo *conn, const void *buf, int len ) {
     return MONGO_OK;
 }
 
-int mongo_env_read_socket( mongo *conn, void *buf, int len ) {
-    char *cbuf = buf;
+int mongo_env_read_socket( mongo *conn, void *buf, size_t len ) {
+    char *cbuf = (char*)buf;
 
     while ( len ) {
-        int sent = recv( conn->sock, cbuf, len, 0 );
+        size_t sent = recv( conn->sock, cbuf, len, 0 );
         if ( sent == 0 || sent == -1 ) {
             __mongo_set_error( conn, MONGO_IO_ERROR, NULL, WSAGetLastError() );
             return MONGO_ERROR;
@@ -120,7 +120,7 @@ int mongo_env_socket_connect( mongo *conn, const char *host, int port ) {
         conn->sock = socket( ai_ptr->ai_family, ai_ptr->ai_socktype,
                              ai_ptr->ai_protocol );
 
-        if ( conn->sock < 0 ) {
+        if ( conn->sock == INVALID_SOCKET ) {
             __mongo_set_error( conn, MONGO_SOCKET_ERROR, "socket() failed",
                                WSAGetLastError() );
             conn->sock = 0;
@@ -140,7 +140,7 @@ int mongo_env_socket_connect( mongo *conn, const char *host, int port ) {
             int flag = 1;
 
             setsockopt( conn->sock, IPPROTO_TCP, TCP_NODELAY,
-                        ( void * ) &flag, sizeof( flag ) );
+                        ( const char * ) &flag, sizeof( flag ) );
 
             if ( conn->op_timeout_ms > 0 )
                 mongo_env_set_socket_op_timeout( conn, conn->op_timeout_ms );
@@ -217,7 +217,7 @@ MONGO_EXPORT int mongo_env_sock_init( void ) {
 # define NI_MAXSERV 32
 #endif
 
-int mongo_env_close_socket( int socket ) {
+int mongo_env_close_socket( SOCKET socket ) {
     return close( socket );
 }
 
@@ -225,7 +225,7 @@ int mongo_env_sock_init( void ) {
     return 0;
 }
 
-int mongo_env_write_socket( mongo *conn, const void *buf, int len ) {
+int mongo_env_write_socket( mongo *conn, const void *buf, size_t len ) {
     const char *cbuf = buf;
 #ifdef __APPLE__
     int flags = 0;
@@ -234,7 +234,7 @@ int mongo_env_write_socket( mongo *conn, const void *buf, int len ) {
 #endif
 
     while ( len ) {
-        int sent = send( conn->sock, cbuf, len, flags );
+        size_t sent = send( conn->sock, cbuf, len, flags );
         if ( sent == -1 ) {
             if (errno == EPIPE)
                 conn->connected = 0;
@@ -248,10 +248,10 @@ int mongo_env_write_socket( mongo *conn, const void *buf, int len ) {
     return MONGO_OK;
 }
 
-int mongo_env_read_socket( mongo *conn, void *buf, int len ) {
+int mongo_env_read_socket( mongo *conn, void *buf, size_t len ) {
     char *cbuf = buf;
     while ( len ) {
-        int sent = recv( conn->sock, cbuf, len, 0 );
+        size_t sent = recv( conn->sock, cbuf, len, 0 );
         if ( sent == 0 || sent == -1 ) {
             __mongo_set_error( conn, MONGO_IO_ERROR, strerror( errno ), errno );
             return MONGO_ERROR;
@@ -290,11 +290,10 @@ static int mongo_env_unix_socket_connect( mongo *conn, const char *sock_path ) {
 
     conn->sock = socket( AF_UNIX, SOCK_STREAM, 0 );
 
-    if ( conn->sock < 0 ) {
-        conn->sock = 0;
+    if ( conn->sock == INVALID_SOCKET ) {
         return MONGO_ERROR;
     }
-
+    
     addr.sun_family = AF_UNIX;
     strncpy( addr.sun_path, sock_path, sizeof(addr.sun_path) - 1 );
     len = sizeof( addr );
@@ -346,17 +345,23 @@ int mongo_env_socket_connect( mongo *conn, const char *host, int port ) {
 
     for ( ai_ptr = ai_list; ai_ptr != NULL; ai_ptr = ai_ptr->ai_next ) {
         conn->sock = socket( ai_ptr->ai_family, ai_ptr->ai_socktype, ai_ptr->ai_protocol );
-        if ( conn->sock < 0 ) {
-            conn->sock = 0;
+        if ( conn->sock == INVALID_SOCKET ) {
             continue;
         }
-
+        
         status = connect( conn->sock, ai_ptr->ai_addr, ai_ptr->ai_addrlen );
         if ( status != 0 ) {
             mongo_env_close_socket( conn->sock );
             conn->sock = 0;
             continue;
         }
+#if __APPLE__
+        {
+            int flag = 1;
+            setsockopt( conn->sock, SOL_SOCKET, SO_NOSIGPIPE,
+                       ( void * ) &flag, sizeof( flag ) );
+        }
+#endif
 
         if ( ai_ptr->ai_protocol == IPPROTO_TCP ) {
             int flag = 1;
@@ -428,7 +433,7 @@ typedef int socklen_t;
 # define NI_MAXSERV 32
 #endif
 
-int mongo_env_close_socket( int socket ) {
+int mongo_env_close_socket( SOCKET socket ) {
 #ifdef _WIN32
     return closesocket( socket );
 #else
@@ -436,7 +441,7 @@ int mongo_env_close_socket( int socket ) {
 #endif
 }
 
-int mongo_env_write_socket( mongo *conn, const void *buf, int len ) {
+int mongo_env_write_socket( mongo *conn, const void *buf, size_t len ) {
     const char *cbuf = buf;
 #ifdef _WIN32
     int flags = 0;
@@ -449,7 +454,7 @@ int mongo_env_write_socket( mongo *conn, const void *buf, int len ) {
 #endif
 
     while ( len ) {
-        int sent = send( conn->sock, cbuf, len, flags );
+        size_t sent = send( conn->sock, cbuf, len, flags );
         if ( sent == -1 ) {
             if (errno == EPIPE)
                 conn->connected = 0;
@@ -463,10 +468,10 @@ int mongo_env_write_socket( mongo *conn, const void *buf, int len ) {
     return MONGO_OK;
 }
 
-int mongo_env_read_socket( mongo *conn, void *buf, int len ) {
+int mongo_env_read_socket( mongo *conn, void *buf, size_t len ) {
     char *cbuf = buf;
     while ( len ) {
-        int sent = recv( conn->sock, cbuf, len, 0 );
+        size_t sent = recv( conn->sock, cbuf, len, 0 );
         if ( sent == 0 || sent == -1 ) {
             conn->err = MONGO_IO_ERROR;
             return MONGO_ERROR;
@@ -488,7 +493,7 @@ int mongo_env_socket_connect( mongo *conn, const char *host, int port ) {
     socklen_t addressSize;
     int flag = 1;
 
-    if ( ( conn->sock = socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 ) {
+    if ( ( conn->sock = socket( AF_INET, SOCK_STREAM, 0 ) ) == INVALID_SOCKET ) {
         conn->sock = 0;
         conn->err = MONGO_CONN_NO_SOCKET;
         return MONGO_ERROR;
@@ -500,7 +505,7 @@ int mongo_env_socket_connect( mongo *conn, const char *host, int port ) {
     sa.sin_addr.s_addr = inet_addr( host );
     addressSize = sizeof( sa );
 
-    if ( connect( conn->sock, ( struct sockaddr * )&sa, addressSize ) == -1 ) {
+    if ( connect( conn->sock, ( struct sockaddr * )&sa, addressSize ) == INVALID_SOCKET ) {
         mongo_env_close_socket( conn->sock );
         conn->connected = 0;
         conn->sock = 0;

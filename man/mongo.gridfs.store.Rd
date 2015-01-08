@@ -3,7 +3,7 @@
 \alias{mongo.gridfs.store}
 \title{Store raw data as a file in a GridFS}
 \usage{
-mongo.gridfs.store(gridfs, raw, remotename, contenttype = "")
+mongo.gridfs.store(gridfs, raw, remotename, contenttype = "", flags = NULL)
 }
 \arguments{
 \item{gridfs}{A (\link{mongo.gridfs}) object.}
@@ -14,6 +14,8 @@ mongo.gridfs.store(gridfs, raw, remotename, contenttype = "")
 GridFS.}
 
 \item{contenttype}{(string) Optional MIME content type.}
+
+\item{flags}{(int) = NULL, Optional. The value of the flags to set on the provided GridFile. Store here special flags such as: No MD5 calculation and Zlib Compression enabled.}
 }
 \value{
 TRUE, if successful; FALSE, if an error occured during the
