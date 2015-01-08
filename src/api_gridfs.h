@@ -18,10 +18,10 @@
 
 SEXP mongo_gridfs_create(SEXP mongo_conn, SEXP db, SEXP prefix);
 SEXP mongo_gridfs_destroy(SEXP gfs);
-SEXP mongo_gridfs_store_file(SEXP gfs, SEXP filename, SEXP remotename, SEXP contenttype);
-SEXP mongo_gridfs_store(SEXP gfs, SEXP raw, SEXP remotename, SEXP contenttype);
+SEXP mongo_gridfs_store_file(SEXP gfs, SEXP filename, SEXP remotename, SEXP contenttype, SEXP flags);
+SEXP mongo_gridfs_store(SEXP gfs, SEXP raw, SEXP remotename, SEXP contenttype, SEXP flags);
 SEXP mongo_gridfs_remove_file(SEXP gfs, SEXP filename);
-SEXP mongo_gridfile_writer_create(SEXP gfs, SEXP remotename, SEXP contenttype);
+SEXP mongo_gridfile_writer_create(SEXP gfs, SEXP remotename, SEXP contenttype, SEXP flags);
 SEXP mongo_gridfile_writer_write(SEXP gfw, SEXP raw);
 SEXP mongo_gridfile_writer_finish(SEXP gfw);
 SEXP mongo_gridfile_destroy(SEXP gfile);
@@ -34,7 +34,7 @@ SEXP mongo_gridfile_get_length(SEXP gfile);
 SEXP mongo_gridfile_get_content_type(SEXP gfile);
 SEXP mongo_gridfile_get_upload_date(SEXP gfile);
 SEXP mongo_gridfile_get_md5(SEXP gfile);
-SEXP mongo_gridfile_get_metadata(SEXP gfile);
+SEXP mongo_gridfile_get_metadata(SEXP gfile, SEXP copyData);
 SEXP mongo_gridfile_get_chunk(SEXP gfile, SEXP i);
 SEXP mongo_gridfile_get_chunks(SEXP gfile, SEXP start, SEXP count);
 SEXP mongo_gridfile_read(SEXP gfile, SEXP size);

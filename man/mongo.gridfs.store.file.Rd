@@ -3,7 +3,8 @@
 \alias{mongo.gridfs.store.file}
 \title{Store a file into a GridFS on a MongoDB server}
 \usage{
-mongo.gridfs.store.file(gridfs, filename, remotename = "", contenttype = "")
+mongo.gridfs.store.file(gridfs, filename, remotename = "", contenttype = "",
+  flags = NULL)
 }
 \arguments{
 \item{gridfs}{A (\link{mongo.gridfs}) object.}
@@ -16,6 +17,8 @@ GridFS.\cr If remotename=="" (the default), the remote file will be known by
 the given \code{filename}.}
 
 \item{contenttype}{(string) Optional MIME content type.}
+
+\item{flags}{(int) = NULL, Optional. The value of the flags to set on the provided GridFile. Store here special flags such as: No MD5 calculation and Zlib Compression enabled.}
 }
 \value{
 TRUE, if successful; FALSE, if an error occured during the

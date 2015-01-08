@@ -43,11 +43,11 @@ SEXP ConvertValue(bson_iterator* iter, bool simplify){
             UNPROTECT(2);
             return ret;
         case BSON_ARRAY:
-            bson_iterator_subobject(iter, &sub);
+            bson_iterator_subobject_init(iter, &sub, 0);
             if(simplify) return ConvertArray(&sub, simplify);
             else return(ConvertObject(&sub, false, simplify));
         case BSON_OBJECT:
-            bson_iterator_subobject(iter, &sub);
+            bson_iterator_subobject_init(iter, &sub, 0);
             return ConvertObject(&sub, true, simplify);
         case BSON_BINDATA:
         case BSON_OID:

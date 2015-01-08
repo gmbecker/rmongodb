@@ -52,7 +52,7 @@ static const R_CallMethodDef callMethods[] = {
     { ".mongo.cursor.next", (DL_FUNC) rmongo_cursor_next, 1 },
     { ".mongo.cursor.value", (DL_FUNC) mongo_cursor_value, 1 },
     { ".mongo.cursor.destroy", (DL_FUNC) rmongo_cursor_destroy, 1 },
-    { ".mongo.index.create", (DL_FUNC) mongo_index_create, 4 },
+    { ".mongo.index.create", (DL_FUNC) mongo_index_create, 6 },
     { ".mongo.count", (DL_FUNC) rmongo_count, 3 },
     { ".mongo.command", (DL_FUNC) mongo_command, 3 },
     { ".mongo.simple.command", (DL_FUNC) mongo_simple_command, 4 },
@@ -120,8 +120,8 @@ static const R_CallMethodDef callMethods[] = {
 
     { ".mongo.gridfs.create", (DL_FUNC) mongo_gridfs_create, 3},
     { ".mongo.gridfs.destroy", (DL_FUNC) mongo_gridfs_destroy, 1},
-    { ".mongo.gridfs.store.file", (DL_FUNC) mongo_gridfs_store_file, 4},
-    { ".mongo.gridfs.store", (DL_FUNC) mongo_gridfs_store, 4},
+    { ".mongo.gridfs.store.file", (DL_FUNC) mongo_gridfs_store_file, 5},
+    { ".mongo.gridfs.store", (DL_FUNC) mongo_gridfs_store, 5},
     { ".mongo.gridfs.remove.file", (DL_FUNC) mongo_gridfs_remove_file, 2},
     { ".mongo.gridfs.find", (DL_FUNC) mongo_gridfs_find, 2},
     { ".mongo.gridfile.destroy", (DL_FUNC) mongo_gridfile_destroy, 1},
@@ -138,7 +138,7 @@ static const R_CallMethodDef callMethods[] = {
     { ".mongo.gridfile.get.chunks", (DL_FUNC) mongo_gridfile_get_chunks, 3},
     { ".mongo.gridfile.read", (DL_FUNC) mongo_gridfile_read, 2},
     { ".mongo.gridfile.seek", (DL_FUNC) mongo_gridfile_seek, 2},
-    { ".mongo.gridfile.writer.create", (DL_FUNC) mongo_gridfile_writer_create, 3},
+    { ".mongo.gridfile.writer.create", (DL_FUNC) mongo_gridfile_writer_create, 4},
     { ".mongo.gridfile.writer.write", (DL_FUNC) mongo_gridfile_writer_write, 2},
     { ".mongo.gridfile.writer.finish", (DL_FUNC) mongo_gridfile_writer_finish, 1},
 

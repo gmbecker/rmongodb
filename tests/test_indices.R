@@ -10,10 +10,10 @@ db <- "rmongodb"
 ns <- paste(db, "test_indices", sep=".")
 
 if( mongo.is.connected(mongo) ){
-  
+
   # clean up old existing collection
   mongo.drop(mongo, ns)
-   
+
 #   for( i in rep(1:10,3)){
 #     mongo.insert(mongo, ns, mongo.bson.from.JSON(paste('{"b":',i,'}')))
 #   }
@@ -22,16 +22,16 @@ if( mongo.is.connected(mongo) ){
 #   checkTrue( is.null(out) )
 #   count2 <- mongo.count(mongo, ns)
 #   checkTrue( count2 < count1)
-  
+
   print("test add dup key")
   for( i in 1:10){
     mongo.insert(mongo, ns, mongo.bson.from.JSON(paste('{"a":',i,', "b":"', letters[i],'"}', sep="")))
   }
-  out <- mongo.index.create(mongo, ns, "a", mongo.index.unique)
+  out <- mongo.index.create(mongo = mongo, ns = ns, key = "a", options =  mongo.index.unique, ttl = -1)
   checkTrue( is.null(out) )
   insert <- mongo.insert(mongo, ns, mongo.bson.from.JSON('{"a":5}'))
   checkTrue( !insert )
-  
+
   # create indey by key
   buf <- mongo.bson.buffer.create()
   mongo.bson.buffer.append(buf, "b", "")
@@ -40,7 +40,7 @@ if( mongo.is.connected(mongo) ){
   print("index create")
   out  <- mongo.index.create(mongo, ns, b)
   checkTrue( is.null(out) )
-  
+
   # cleanup db and close connection
   mongo.drop.database(mongo, db)
   mongo.destroy(mongo)

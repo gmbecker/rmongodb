@@ -34,9 +34,13 @@ mongo.list.from.argument <- function(arg, simplify = T) {
 }
 
 # make flat list without type coercion
-flatten <- function(lst) {
-  lst[['__dummy']] <- function() NULL
-  lst <- unlist(lst)
-  lst[['__dummy']] <- NULL
-  lst
+# http://r.789695.n4.nabble.com/Feature-request-extend-functionality-of-unlist-by-args-delim-c-quot-quot-quot-quot-etc-and-keep-spec-td3535536.html
+flatten <- function(lst, recursive = T,  use.names = TRUE) {
+  if(isTRUE(recursive)) {
+    lst <- c(list(function() NULL), lst)
+    lst <- unlist(lst, recursive = recursive, use.names = use.names)
+    lst[[1]] <- NULL
+    return(lst)
+  }
+  else return(unlist(lst, recursive = recursive, use.names = use.names))
 }

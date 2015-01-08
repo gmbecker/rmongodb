@@ -59,11 +59,13 @@ mongo.index.sparse     <- 16L
 #'
 #' Alternately, \code{key} may be a valid JSON character string which will be converted to a
 #' mongo.bson object by \code{\link{mongo.bson.from.JSON}()}.
-#' @param options (integer vector) Optional flags governing the operation:
+#' @param options (integer vector) Optional flags governing the operation.
 #' \itemize{ \item\code{\link{mongo.index.unique}}
 #' \item\code{\link{mongo.index.drop.dups}}
 #' \item\code{\link{mongo.index.background}}
 #' \item\code{\link{mongo.index.sparse}} }
+#' @param name (character) = NULL. Optional index name.
+#' @param ttl (integer) = -1 (not remove data). Optional time to live parameter \url{http://docs.mongodb.org/manual/tutorial/expire-data/}.
 #' @return NULL if successful; otherwise, a \link{mongo.bson} object describing
 #' the error.\cr \code{\link{mongo.get.server.err}()} or
 #' \code{\link{mongo.get.server.err.string}()} may alternately be called in
@@ -99,12 +101,13 @@ mongo.index.sparse     <- 16L
 #' }
 #'
 #' @export mongo.index.create
-mongo.index.create <- function(mongo, ns, key, options=0L) {
+mongo.index.create <- function(mongo, ns, key, options = 0L, name = NULL, ttl = -1L) {
 
   #check for mongodb connection
   if( !mongo.is.connected(mongo))
     stop("No mongoDB connection!")
-
+  if(!(is.character(name) | is.null(name)))
+    stop("name shouild be character of NULL!")
   #validate and process input
   if( class(key) == "mongo.bson"){
     key <- key
@@ -117,7 +120,7 @@ mongo.index.create <- function(mongo, ns, key, options=0L) {
       key <- key
   }
 
-  .Call(".mongo.index.create", mongo, ns, key, options)
+  .Call(".mongo.index.create", mongo, ns, key, options, name, ttl)
 }
 
 

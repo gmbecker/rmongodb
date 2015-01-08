@@ -3,7 +3,8 @@
 \alias{mongo.gridfile.writer.create}
 \title{Create a mongo.gridfile.writer object}
 \usage{
-mongo.gridfile.writer.create(gridfs, remotename, contenttype = "")
+mongo.gridfile.writer.create(gridfs, remotename, contenttype = "",
+  flags = NULL)
 }
 \arguments{
 \item{gridfs}{A (\link{mongo.gridfs}) object.}
@@ -12,6 +13,8 @@ mongo.gridfile.writer.create(gridfs, remotename, contenttype = "")
 GridFS.}
 
 \item{contenttype}{(string) Optional MIME content type.}
+
+\item{flags}{(int) = NULL, Optional. The value of the flags to set on the provided GridFile. Store here special flags such as: No MD5 calculation and Zlib Compression enabled.}
 }
 \value{
 (\link{mongo.gridfile.writer}) The object to be used for writing to
