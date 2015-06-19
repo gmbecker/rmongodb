@@ -6,7 +6,7 @@ Introduction to the rmongodb Package
 
 MongoDB (www.mongodb.org) is a scalable, high-performance, document-oriented NoSQL database. The **rmongodb** package provides an interface from the statistical software R (www.r-project.org) to MongoDB and back using the mongodb-C library. 
 
-This vignette will provide a first introduction to the **rmongodb** package and offer a lot of code to get stared. If you need anyhelp getting started with MongoDB please check the resources provided by MongoDB: http://docs.mongodb.org/manual/tutorial/getting-started/
+This vignette will provide a first introduction to the **rmongodb** package and offer a lot of code to get stared. If you need any help getting started with MongoDB please check the resources provided by MongoDB: http://docs.mongodb.org/manual/tutorial/getting-started/
 
 
 # Installing and loading the rmongodb package
@@ -33,7 +33,7 @@ library(rmongodb)
 
 
 # Connecting R to MongoDB
-First of all we have to create a connection to a MongoDB installation. If no paramters are provided we connect to the MongoDB installation running on localhost. Parameters for external installations and user authentication are implemented and documented.
+First of all we have to create a connection to a MongoDB installation. If no parameters are provided we connect to the MongoDB installation running on localhost. Parameters for external installations and user authentication are implemented and documented.
 ```{r connect2Mongo}
 help("mongo.create")
 mongo <- mongo.create()
@@ -47,7 +47,7 @@ if(mongo.is.connected(mongo) == TRUE) {
   # load some data
   library(jsonlite)
   data(zips)
-  # rename _id field. The original zips data set holds duplicate _id values which will fale during the import
+  # rename _id field. The original zips data set holds duplicate _id values which will fail during the import
   colnames(zips)[5] <- "orig_id"
   
   ziplist <- list()
@@ -122,7 +122,7 @@ if(mongo.is.connected(mongo) == TRUE) {
 
 
 # Creating BSON objects
-The most convinient way to construct bson objects is to to use ```mongo.bson.from.list``` function. 
+The most convenient way to construct bson objects is to to use ```mongo.bson.from.list``` function.
 It is very natural, because R lists are very similar to JSON objects - each level of JSON object 
 can be represented by **named** list and each array can be represented by **unnamed** list:
 ```{r createBSONfromList}
@@ -148,7 +148,7 @@ mongo.bson.from.JSON('{"city":"COLORADO CITY", "loc":[-112.952427, 36.976266]}')
 date_string <- "2014-10-11 12:01:06"
 # Pay attention to timezone argument
 query <- mongo.bson.from.list(list(date = as.POSIXct(date_string, tz='MSK')))
-# Note, that internall MongoDB strores dates in unixtime format:
+# Note, that internally MongoDB stores dates in unixtime format:
 query
 ```
 You should construct bsons manually using ```mongo.bson.buffer.create```, ```mongo.bson.buffer.append```, ```mongo.bson.from.buffer``` if it contains MongoDB specific data types such as ```BSON_OID```, ```BSON_REGEX```, etc.
@@ -156,7 +156,7 @@ You should construct bsons manually using ```mongo.bson.buffer.create```, ```mon
 
 
 # Finding more data
-For real analyses it is important to get more than one document of data from MongoDB. As an example, we first use the command ```mongo.distict``` to get an overview about the population distribution. Then we check for all cities with less than two inhabitants (errors in the data set?). 
+For real analyses it is important to get more than one document of data from MongoDB. As an example, we first use the command ```mongo.distinct``` to get an overview about the population distribution. Then we check for all cities with less than two inhabitants (errors in the data set?).
 ```{r findMore, warning=FALSE}
 if(mongo.is.connected(mongo) == TRUE) {
   pop <- mongo.distinct(mongo, coll, "pop")
@@ -259,4 +259,3 @@ if(mongo.is.connected(mongo) == TRUE) {
 
 # Feedback and Issues
 Please do not hesitate to contact us if there are any issues using **rmongodb**. Issues or pull requests can be submitted via github: https://github.com/mongosoup/rmongodb
-
