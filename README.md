@@ -1,3 +1,9 @@
+# Project status
+
+Dear R and rmongodb users, `rmongodb` project is based on legacy C drivers. For the moment, I (@dselivanov) don't have time for `rmongodb` development. And unless someone will not port new drivers, package will remain with outdated functionality (see [issues](https://github.com/mongosoup/rmongodb/issues) ). I some of you want to udertake package maintainance - let me know.
+
+For new R / mongodb users , I recommend to start with [mongolite](https://github.com/jeroenooms/mongolite) package wich is much more actively maintained.
+
 rmongodb
 ===================
 
