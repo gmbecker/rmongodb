@@ -37,7 +37,7 @@ Once you have installed the package, it may be loaded from within R like any oth
     # Find the first 100 records
     #    in collection people of database test where age == 27
     cursor <- mongo.find(mongo, "test.people", query, limit=100L)
-    # Step though the matching records and display them
+    # Step through the matching records and display them
     while (mongo.cursor.next(cursor))
         print(mongo.cursor.value(cursor))
     mongo.cursor.destroy(cursor)
