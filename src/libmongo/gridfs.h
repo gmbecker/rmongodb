@@ -24,7 +24,7 @@
 #ifndef MONGO_GRIDFS_H_
 #define MONGO_GRIDFS_H_
 
-enum {DEFAULT_CHUNK_SIZE = 256 * 1024};
+enum {DEFAULT_CHUNK_SIZE = 255 * 1024};
 
 typedef uint64_t gridfs_offset;
 
