@@ -10,7 +10,7 @@ Imports:
     plyr
 Author: MongoDB, Inc. (mongo-c-driver) & Markus Schmidberger (mongosoup.de).
     Formerly Gerald Lindsly.
-Maintainer: Dmitriy Selivanov <selivanov.dmitriy@gmail.com>
+Maintainer: Kiran Mukhyala <mukhyala.kiran@gene.com>
 Description: This R package provides an interface to the NoSQL MongoDB database
     using the MongoDB C-driver version 0.8.
 License: Apache License 2.0
